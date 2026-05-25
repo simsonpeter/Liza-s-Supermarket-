@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>🛒 Kids Supermarkt Kassa</title>
+<title>👑 Liza's Business Portal</title>
 
 <style>
 *{
@@ -18,17 +18,127 @@ body{
   background:linear-gradient(135deg,#ffecd2,#fcb69f);
   min-height:100vh;
   overflow-x:hidden;
+  padding: 10px;
 }
 
 .app{
   max-width:1200px;
   margin:auto;
-  padding:10px;
 }
 
-/* HEADER */
+/* PORTAL HOME SCREEN */
+.portal-container {
+  max-width: 800px;
+  margin: 40px auto;
+  text-align: center;
+  padding: 20px;
+}
+
+.portal-header-main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.portal-title {
+  color: #764ba2;
+  font-size: 2.5rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.admin-portal-btn {
+  background: #2f3542;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 14px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9rem;
+  transition: transform 0.1s;
+}
+
+.admin-portal-btn:active {
+  transform: scale(0.95);
+}
+
+.portal-subtitle {
+  color: #555;
+  font-size: 1.1rem;
+  margin-bottom: 40px;
+}
+
+.portal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.portal-card {
+  background: white;
+  border-radius: 24px;
+  padding: 40px 20px;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid transparent;
+}
+
+.portal-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.portal-card:active {
+  transform: scale(0.95);
+}
+
+.card-supermarket { border-color: #667eea; }
+.card-supermarket .card-icon { background: #f1f3ff; }
+.card-restaurant { border-color: #ff4757; }
+.card-restaurant .card-icon { background: #fff5f5; }
+
+.card-icon {
+  font-size: 4rem;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.card-name {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.card-desc {
+  font-size: 0.95rem;
+  color: #777;
+}
+
+/* APP SCREENS MANAGEMENT */
+.view-screen {
+  display: none;
+}
+.view-screen.active {
+  display: block;
+}
+
+/* HEADER WITH HOME NAVIGATION */
 .header{
-  background:linear-gradient(135deg,#667eea,#764ba2);
   color:white;
   padding:14px 20px;
   border-radius:20px;
@@ -39,12 +149,32 @@ body{
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-.header h1{
-  font-size:1.4rem;
+#supermarketView .header { background:linear-gradient(135deg,#667eea,#764ba2); }
+#restaurantView .header { background:linear-gradient(135deg,#ff4757,#ff6b81); }
+#adminView .header { background:linear-gradient(135deg,#2f3542,#57606f); }
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
+.home-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.4);
+  padding: 8px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.85rem;
+  transition: background 0.2s;
+}
+
+.home-btn:hover { background: rgba(255, 255, 255, 0.3); }
+.header h1{ font-size:1.4rem; }
+
 .clear-btn{
-  background:#ff4d6d;
   color:white;
   border:none;
   padding:10px 16px;
@@ -53,12 +183,12 @@ body{
   font-weight:bold;
   transition: transform 0.1s;
 }
+#supermarketView .clear-btn { background:#ff4d6d; }
+#restaurantView .clear-btn { background:#2f3542; }
 
-.clear-btn:active{
-  transform: scale(0.95);
-}
+.clear-btn:active{ transform: scale(0.95); }
 
-/* MAIN */
+/* MAIN CONTENT SPLIT */
 .main{
   display:flex;
   gap:10px;
@@ -112,31 +242,18 @@ body{
   box-shadow:0 4px 12px rgba(0,0,0,.08);
   transition:.15s;
   height:110px;
-
   display:flex;
   flex-direction:column;
   justify-content:center;
   align-items:center;
 }
 
-.product:active{
-  transform:scale(.92);
-}
-
-.product .emoji{
-  font-size:2rem;
-}
-
-.product .name{
-  font-size:.8rem;
-  font-weight:600;
-}
-
-.product .price{
-  color:#667eea;
-  font-weight:bold;
-  font-size:.8rem;
-}
+.product:active{ transform:scale(.92); }
+.product .emoji{ font-size:2rem; }
+.product .name{ font-size:.8rem; font-weight:600; margin-top: 2px; }
+.product .price{ font-weight:bold; font-size:.8rem; }
+#supermarketView .product .price { color:#667eea; }
+#restaurantView .product .price { color:#ff4757; }
 
 /* CART */
 .cart{
@@ -156,8 +273,9 @@ body{
   display:flex;
   justify-content:space-between;
   font-weight:bold;
-  color:#764ba2;
 }
+#supermarketView .cart-header { color:#764ba2; }
+#restaurantView .cart-header { color:#ff4757; }
 
 .cart-items{
   flex:1;
@@ -174,13 +292,9 @@ body{
   color:#bbb;
 }
 
-.empty .emoji{
-  font-size:3rem;
-  margin-bottom:10px;
-}
+.empty .emoji{ font-size:3rem; margin-bottom:10px; }
 
 .cart-item{
-  background:#f8f9ff;
   padding:10px;
   border-radius:12px;
   margin-bottom:8px;
@@ -188,12 +302,10 @@ body{
   justify-content:space-between;
   align-items:center;
 }
+#supermarketView .cart-item { background: #f8f9ff; }
+#restaurantView .cart-item { background: #fff5f5; }
 
-.left{
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
+.left{ display:flex; align-items:center; gap:8px; }
 
 .qty-controls {
   display: flex;
@@ -219,17 +331,8 @@ body{
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.qty-btn:active {
-  transform: scale(0.9);
-}
-
-.qty{
-  font-weight: bold;
-  min-width: 18px;
-  text-align: center;
-  font-size:.85rem;
-  color: #333;
-}
+.qty-btn:active { transform: scale(0.9); }
+.qty{ font-weight: bold; min-width: 18px; text-align: center; font-size:.85rem; color: #333; }
 
 .total{
   padding:14px;
@@ -239,16 +342,13 @@ body{
   align-items:center;
 }
 
-.total-price{
-  font-size:1.6rem;
-  font-weight:bold;
-  color:#764ba2;
-}
+.total-price{ font-size:1.6rem; font-weight:bold; }
+#supermarketView .total-price { color:#764ba2; }
+#restaurantView .total-price { color:#ff4757; }
 
 .checkout{
   margin:0 12px 12px;
   border:none;
-  background:linear-gradient(135deg,#11998e,#38ef7d);
   color:white;
   padding:16px;
   border-radius:16px;
@@ -257,235 +357,193 @@ body{
   cursor:pointer;
   transition: transform 0.1s;
 }
+#supermarketView .checkout { background:linear-gradient(135deg,#11998e,#38ef7d); }
+#restaurantView .checkout { background:linear-gradient(135deg,#2ed573,#1e90ff); }
 
-.checkout:active:not(:disabled){
-  transform: scale(0.98);
+.checkout:active:not(:disabled){ transform: scale(0.98); }
+.checkout:disabled{ opacity:.5; cursor:not-allowed; }
+
+/* ADMIN INTERFACE */
+.admin-grid {
+  display: flex;
+  gap: 20px;
+  margin-top: 10px;
 }
 
-.checkout:disabled{
-  opacity:.5;
-  cursor:not-allowed;
+.admin-panel {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
-/* PROFESSIONAL RECEIPT MODAL SYSTEM */
+.admin-form-section { flex: 1; }
+.admin-list-section { flex: 1.5; display: flex; flex-direction: column; max-height: 70vh; }
+
+.admin-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #2f3542;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 5px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #eee;
+  border-radius: 12px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.form-group input:focus, .form-group select:focus {
+  border-color: #57606f;
+}
+
+.btn-save-item {
+  width: 100%;
+  padding: 14px;
+  background: #2ed573;
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-save-item:active { transform: scale(0.98); }
+
+.admin-item-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.admin-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: #f1f2f6;
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+.admin-row-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-row-emoji { font-size: 1.8rem; }
+.admin-row-name { font-weight: bold; font-size: 0.9rem; }
+.admin-row-meta { font-size: 0.75rem; color: #777; }
+
+.btn-delete-item {
+  background: #ff4757;
+  color: white;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* RECEIPT MODAL SYSTEM */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(0,0,0,0.5);
   backdrop-filter: blur(4px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  opacity: 0;
-  pointer-events: none;
+  display: flex; justify-content: center; align-items: center;
+  z-index: 1000; opacity: 0; pointer-events: none;
   transition: opacity 0.3s ease;
 }
 
-.modal-overlay.open {
-  opacity: 1;
-  pointer-events: auto;
-}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
 
 .receipt-container {
-  background: white;
-  width: 360px;
-  max-height: 90vh;
-  border-radius: 4px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-  display: flex;
-  flex-direction: column;
-  transform: scale(0.8);
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: white; width: 360px; max-height: 90vh;
+  border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  display: flex; flex-direction: column;
+  transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
 }
 
-.modal-overlay.open .receipt-container {
-  transform: scale(1);
-}
+.modal-overlay.open .receipt-container { transform: scale(1); }
 
-/* Real paper receipt look & zigzag edge */
 .receipt-paper {
-  background: #fff;
-  padding: 25px 20px 15px 20px;
-  overflow-y: auto;
-  font-family: 'Courier New', Courier, monospace;
-  color: #222;
-  position: relative;
+  background: #fff; padding: 25px 20px 15px 20px;
+  overflow-y: auto; font-family: 'Courier New', Courier, monospace;
+  color: #222; position: relative;
 }
 
 .receipt-paper::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 6px;
+  content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 6px;
   background: linear-gradient(-135deg, #fff 3px, transparent 0), linear-gradient(135deg, #fff 3px, transparent 0);
-  background-size: 6px 6px;
-  transform: translateY(-6px);
+  background-size: 6px 6px; transform: translateY(-6px);
 }
 
 .receipt-paper::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 6px;
+  content: ""; position: absolute; bottom: 0; left: 0; width: 100%; height: 6px;
   background: linear-gradient(-45deg, transparent 3px, #fff 0), linear-gradient(45deg, transparent 3px, #fff 0);
   background-size: 6px 6px;
 }
 
-.receipt-header {
-  text-align: center;
-  margin-bottom: 15px;
-}
-
-.receipt-store-name {
-  font-size: 1.2rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.receipt-meta {
-  font-size: 0.75rem;
-  color: #555;
-  margin-top: 5px;
-  line-height: 1.3;
-}
-
-.receipt-divider {
-  border-top: 1px dashed #444;
-  margin: 10px 0;
-}
-
-.receipt-table {
-  width: 100%;
-  font-size: 0.85rem;
-  border-collapse: collapse;
-}
-
-.receipt-table th {
-  text-align: left;
-  font-weight: bold;
-  padding-bottom: 5px;
-}
-
-.receipt-table td {
-  padding: 4px 0;
-  vertical-align: top;
-}
-
-.receipt-row-total {
-  font-size: 1.1rem;
-  font-weight: bold;
-}
-
-.receipt-barcode {
-  text-align: center;
-  margin: 20px 0 10px 0;
-  letter-spacing: 4px;
-  font-weight: bold;
-  font-size: 1.1rem;
-}
-
-.receipt-footer-msg {
-  text-align: center;
-  font-size: 0.8rem;
-  font-style: italic;
-  margin-top: 5px;
-}
-
-/* Modal Buttons Container */
-.receipt-actions {
-  padding: 15px;
-  background: #f5f5f5;
-  display: flex;
-  gap: 10px;
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
-}
+.receipt-header { text-align: center; margin-bottom: 15px; }
+.receipt-store-name { font-size: 1.2rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+.receipt-meta { font-size: 0.75rem; color: #555; margin-top: 5px; line-height: 1.3; }
+.receipt-divider { border-top: 1px dashed #444; margin: 10px 0; }
+.receipt-table { width: 100%; font-size: 0.85rem; border-collapse: collapse; }
+.receipt-table th { text-align: left; font-weight: bold; padding-bottom: 5px; }
+.receipt-table td { padding: 4px 0; vertical-align: top; }
+.receipt-row-total { font-size: 1.1rem; font-weight: bold; }
+.receipt-barcode { text-align: center; margin: 20px 0 10px 0; letter-spacing: 4px; font-weight: bold; font-size: 1.1rem; }
+.receipt-footer-msg { text-align: center; font-size: 0.8rem; font-style: italic; margin-top: 5px; }
+.receipt-actions { padding: 15px; background: #f5f5f5; display: flex; gap: 10px; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; }
 
 .btn-receipt {
-  flex: 1;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 0.95rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
+  flex: 1; padding: 12px; border: none; border-radius: 8px;
+  font-weight: bold; font-size: 0.95rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
   transition: opacity 0.2s;
 }
 
-.btn-receipt:active {
-  opacity: 0.8;
-}
-
-.btn-print {
-  background: #764ba2;
-  color: white;
-}
-
-.btn-close-modal {
-  background: #dddddd;
-  color: #333;
-}
+.btn-receipt:active { opacity: 0.8; }
+.btn-print { color: white; }
+.btn-close-modal { background: #dddddd; color: #333; }
 
 /* PRINT OPTIMIZATION */
 @media print {
-  body * {
-    visibility: hidden;
-  }
-  .modal-overlay {
-    position: absolute;
-    left: 0;
-    top: 0;
-    background: none;
-    backdrop-filter: none;
-    opacity: 1 !important;
-  }
-  .receipt-container {
-    box-shadow: none;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-  }
-  .receipt-paper, .receipt-paper * {
-    visibility: visible;
-  }
-  .receipt-actions {
-    display: none !important;
-  }
+  body * { visibility: hidden; }
+  .modal-overlay { position: absolute; left: 0; top: 0; background: none; backdrop-filter: none; opacity: 1 !important; }
+  .receipt-container { box-shadow: none; position: absolute; left: 0; top: 0; width: 100%; }
+  .receipt-paper, .receipt-paper * { visibility: visible; }
+  .receipt-actions { display: none !important; }
 }
 
-/* MOBILE */
+/* MOBILE RESPONSIVENESS */
 @media(max-width:800px){
-
-  .main{
-    flex-direction:column;
-  }
-
-  .cart{
-    min-height:350px;
-  }
-
-  .products-grid{
-    grid-template-columns:repeat(auto-fill,minmax(90px,1fr));
-  }
-
-  .product{
-    height:95px;
-  }
+  .main, .admin-grid { flex-direction:column; }
+  .cart { min-height:350px; }
+  .products-grid { grid-template-columns:repeat(auto-fill,minmax(90px,1fr)); }
+  .product { height:95px; }
+  .portal-title { font-size: 2rem; }
 }
 </style>
 </head>
@@ -494,60 +552,161 @@ body{
 
 <div class="app">
 
-  <div class="header">
-    <h1>🛒 Kids Supermarkt Kassa</h1>
-    <button class="clear-btn" onclick="clearCart()">🗑️ Wis</button>
+  <div class="portal-container view-screen active" id="portalHome">
+    <div class="portal-header-main">
+      <h1 class="portal-title">👑 Liza's Business Portal</h1>
+      <button class="admin-portal-btn" onclick="openAdmin()">⚙️ Beheer</button>
+    </div>
+    <p class="portal-subtitle">Kies een bedrijf om te beheren en bestellingen op te nemen:</p>
+    
+    <div class="portal-grid">
+      <div class="portal-card card-supermarket" onclick="openApp('supermarket')">
+        <div class="card-icon">🛒</div>
+        <div class="card-name">Liza's Supermarkt</div>
+        <div class="card-desc">Scan producten en maak kassabonnen</div>
+      </div>
+      
+      <div class="portal-card card-restaurant" onclick="openApp('restaurant')">
+        <div class="card-icon">🍔</div>
+        <div class="card-name">Liza's Restaurant</div>
+        <div class="card-desc">Neem bestellingen op via het touch-scherm</div>
+      </div>
+    </div>
   </div>
 
-  <div class="main">
 
-    <div class="products-section">
-
-      <div class="categories" id="categories"></div>
-
-      <div class="products-grid" id="productsGrid"></div>
-
+  <div class="view-screen" id="supermarketView">
+    <div class="header">
+      <div class="header-left">
+        <button class="home-btn" onclick="goHome()">🏠 Wissel van Bedrijf</button>
+        <h1>🛒 Kids Supermarkt Kassa</h1>
+      </div>
+      <button class="clear-btn" onclick="clearCart()">🗑️ Wis</button>
     </div>
 
-    <div class="cart">
-
-      <div class="cart-header">
-        <span>🧾 Winkelwagentje</span>
-        <span id="count">0 items</span>
+    <div class="main">
+      <div class="products-section">
+        <div class="categories" id="smCategories"></div>
+        <div class="products-grid" id="smProductsGrid"></div>
       </div>
 
-      <div class="cart-items" id="cartItems">
+      <div class="cart">
+        <div class="cart-header">
+          <span>🧾 Winkelwagentje</span>
+          <span id="smCount">0 items</span>
+        </div>
+        <div class="cart-items" id="smCartItems">
+          <div class="empty">
+            <div class="emoji">🛒</div>
+            <div>Scan producten!</div>
+          </div>
+        </div>
+        <div class="total">
+          <span>Totaal:</span>
+          <span class="total-price" id="smTotal">€0,00</span>
+        </div>
+        <button class="checkout" id="smCheckoutBtn" onclick="checkout()" disabled>💰 Afrekenen</button>
+      </div>
+    </div>
+  </div>
 
-        <div class="empty">
-          <div class="emoji">🛒</div>
-          <div>Scan producten!</div>
+
+  <div class="view-screen" id="restaurantView">
+    <div class="header">
+      <div class="header-left">
+        <button class="home-btn" onclick="goHome()">🏠 Wissel van Bedrijf</button>
+        <h1>👩‍🍳 Liza's Restaurant Bestelscherm</h1>
+      </div>
+      <button class="clear-btn" onclick="clearCart()">🗑️ Reset</button>
+    </div>
+
+    <div class="main">
+      <div class="products-section">
+        <div class="categories" id="resCategories"></div>
+        <div class="products-grid" id="resProductsGrid"></div>
+      </div>
+
+      <div class="cart">
+        <div class="cart-header">
+          <span>📝 Lopende Bestelling</span>
+          <span id="resCount">0 items</span>
+        </div>
+        <div class="cart-items" id="resCartItems">
+          <div class="empty">
+            <div class="emoji">🍽️</div>
+            <div>Tik op het menu om te bestellen!</div>
+          </div>
+        </div>
+        <div class="total">
+          <span>Totaal:</span>
+          <span class="total-price" id="resTotal">€0,00</span>
+        </div>
+        <button class="checkout" id="resCheckoutBtn" onclick="checkout()" disabled>🛎️ Naar de Keuken sturen</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="view-screen" id="adminView">
+    <div class="header">
+      <div class="header-left">
+        <button class="home-btn" onclick="goHome()">🏠 Terug naar Portal</button>
+        <h1>⚙️ Producten & Kaart Beheer (Geen Login)</h1>
+      </div>
+    </div>
+
+    <div class="admin-grid">
+      <div class="admin-panel admin-form-section">
+        <div class="admin-title">✨ Nieuw Item Toevoegen</div>
+        
+        <div class="form-group">
+          <label for="addItemTarget">Voor welk bedrijf?</label>
+          <select id="addItemTarget" onchange="updateAdminCategoryDropdown()">
+            <option value="supermarket">🛒 Liza's Supermarkt</option>
+            <option value="restaurant">🍔 Liza's Restaurant</option>
+          </select>
         </div>
 
+        <div class="form-group">
+          <label for="addItemCat">Categorie</label>
+          <select id="addItemCat"></select>
+        </div>
+
+        <div class="form-group">
+          <label for="addItemName">Naam van het item</label>
+          <input type="text" id="addItemName" placeholder="Bijv. Aardbeienijs of Knuffelbeer">
+        </div>
+
+        <div class="form-group">
+          <label for="addItemEmoji">Foto (Kies een leuke Emoji! 🧸🍕🍭)</label>
+          <input type="text" id="addItemEmoji" placeholder="Typ of plak één emoji" maxlength="4" style="text-align: center; font-size: 1.5rem;">
+        </div>
+
+        <div class="form-group">
+          <label for="addItemPrice">Prijs (€)</label>
+          <input type="number" id="addItemPrice" step="0.01" min="0" placeholder="0.00">
+        </div>
+
+        <button class="btn-save-item" onclick="adminSaveItem()">💾 Item Opslaan</button>
       </div>
 
-      <div class="total">
-        <span>Totaal:</span>
-        <span class="total-price" id="total">€0,00</span>
+      <div class="admin-panel admin-list-section">
+        <div class="admin-title">📋 Huidige Producten Overzicht</div>
+        <div class="admin-item-list" id="adminItemList"></div>
       </div>
-
-      <button class="checkout" id="checkoutBtn" onclick="checkout()" disabled>
-        💰 Afrekenen
-      </button>
-
     </div>
-
   </div>
 
 </div>
 
+
 <div class="modal-overlay" id="receiptModal">
   <div class="receipt-container">
-    
-    <div class="receipt-paper" id="receiptPaper">
+    <div class="receipt-paper">
       <div class="receipt-header">
-        <div class="receipt-store-name">🎪 MINI SUPERMARKT</div>
+        <div class="receipt-store-name" id="receiptStoreName">BUSINESS</div>
         <div class="receipt-meta">
-          Kassa #01 - Kids Playroom<br>
+          <span id="receiptStation">Station #01</span><br>
           Datum: <span id="receiptDate">00-00-0000</span><br>
           Tijd: <span id="receiptTime">00:00</span>
         </div>
@@ -558,13 +717,12 @@ body{
       <table class="receipt-table">
         <thead>
           <tr>
-            <th style="width: 50%;">Product</th>
+            <th id="receiptColHeader" style="width: 50%;">Product</th>
             <th style="width: 15%; text-align: center;">Aantal</th>
             <th style="width: 35%; text-align: right;">Prijs</th>
           </tr>
         </thead>
-        <tbody id="receiptItemsBody">
-          </tbody>
+        <tbody id="receiptItemsBody"></tbody>
       </table>
       
       <div class="receipt-divider"></div>
@@ -579,32 +737,33 @@ body{
       
       <div class="receipt-divider"></div>
       
-      <div class="receipt-meta" style="text-align: center;">
-        Betaalwijze: Glimlach & Speelgeld 🌟
-      </div>
+      <div class="receipt-meta" style="text-align: center;" id="receiptPaymentMethod">Betaalwijze</div>
       
       <div class="receipt-barcode">
         ||||| | |||| || ||| ||||
         <div style="font-size: 0.65rem; font-family: sans-serif; margin-top: 2px;" id="receiptId">#00000</div>
       </div>
       
-      <div class="receipt-footer-msg">
-        Bedankt voor je bezoek! 👋<br>Kom snel nog eens winkelen!
-      </div>
+      <div class="receipt-footer-msg" id="receiptFooterMsg">Bedankt!</div>
     </div>
     
     <div class="receipt-actions">
       <button class="btn-receipt btn-close-modal" onclick="closeReceipt()">Sluiten</button>
-      <button class="btn-receipt btn-print" onclick="window.print()">🖨️ Printen</button>
+      <button class="btn-receipt btn-print" id="receiptPrintBtn" onclick="window.print()">🖨️ Printen</button>
     </div>
-
   </div>
 </div>
 
-<script>
 
-/* CATEGORIES */
-const categories = [
+<script>
+/* ACTIVE APPLICATION STATE */
+let activeApp = 'portal'; 
+let currentCategory = '';
+let cart = [];
+let total = 0;
+
+/* --- CATEGORIES --- */
+const smCategories = [
   {id:'fruit',name:'🍎 Fruit',color:'#ff6b6b'},
   {id:'groente',name:'🥦 Groente',color:'#38ef7d'},
   {id:'drank',name:'🥤 Drank',color:'#667eea'},
@@ -613,56 +772,75 @@ const categories = [
   {id:'bakery',name:'🥐 Bakkerij',color:'#f39c12'}
 ];
 
-/* PRODUCTS */
-const products = [
-  /* FRUIT */
+const resCategories = [
+  {id:'voorgerecht',name:'🥣 Voorgerechten',color:'#ffa502'},
+  {id:'hoofdgerecht',name:'🍔 Hoofdgerechten',color:'#ff4757'},
+  {id:'toetje',name:'🍦 Toetjes',color:'#78e08f'},
+  {id:'drankjes',name:'🥤 Drankjes',color:'#1e90ff'}
+];
+
+/* --- DEFAULT PRODUCTS DATA --- */
+const defaultSmProducts = [
   {id:1,name:'Appel',emoji:'🍎',price:0.79,cat:'fruit'},
   {id:2,name:'Banaan',emoji:'🍌',price:0.69,cat:'fruit'},
   {id:3,name:'Aardbei',emoji:'🍓',price:1.49,cat:'fruit'},
   {id:4,name:'Watermeloen',emoji:'🍉',price:3.99,cat:'fruit'},
   {id:5,name:'Druiven',emoji:'🍇',price:2.49,cat:'fruit'},
   {id:6,name:'Ananas',emoji:'🍍',price:2.99,cat:'fruit'},
-
-  /* GROENTE */
   {id:7,name:'Broccoli',emoji:'🥦',price:1.29,cat:'groente'},
   {id:8,name:'Tomaat',emoji:'🍅',price:0.89,cat:'groente'},
   {id:9,name:'Wortel',emoji:'🥕',price:0.99,cat:'groente'},
   {id:10,name:'Maïs',emoji:'🌽',price:1.19,cat:'groente'},
   {id:11,name:'Paprika',emoji:'🫑',price:1.49,cat:'groente'},
-
-  /* DRINKS */
   {id:12,name:'Water',emoji:'💧',price:0.49,cat:'drank'},
   {id:13,name:'Cola',emoji:'🥤',price:1.29,cat:'drank'},
   {id:14,name:'Sap',emoji:'🧃',price:1.49,cat:'drank'},
   {id:15,name:'Koffie',emoji:'☕',price:2.49,cat:'drank'},
   {id:16,name:'Thee',emoji:'🍵',price:1.19,cat:'drank'},
-
-  /* ZUIVEL */
   {id:17,name:'Melk',emoji:'🥛',price:1.09,cat:'zuivel'},
   {id:18,name:'Kaas',emoji:'🧀',price:2.49,cat:'zuivel'},
   {id:19,name:'Yoghurt',emoji:'🍶',price:1.59,cat:'zuivel'},
   {id:20,name:'Boter',emoji:'🧈',price:1.89,cat:'zuivel'},
   {id:21,name:'Ijs',emoji:'🍦',price:2.99,cat:'zuivel'},
-
-  /* SNACKS */
   {id:22,name:'Donut',emoji:'🍩',price:1.29,cat:'snacks'},
   {id:23,name:'Cookie',emoji:'🍪',price:0.89,cat:'snacks'},
   {id:24,name:'Lolly',emoji:'🍭',price:0.59,cat:'snacks'},
   {id:25,name:'Chips',emoji:'🍟',price:1.99,cat:'snacks'},
   {id:26,name:'Chocolade',emoji:'🍫',price:1.49,cat:'snacks'},
-
-  /* BAKERY */
   {id:27,name:'Croissant',emoji:'🥐',price:1.19,cat:'bakery'},
   {id:28,name:'Brood',emoji:'🍞',price:1.99,cat:'bakery'},
   {id:29,name:'Bagel',emoji:'🥯',price:1.49,cat:'bakery'},
   {id:30,name:'Pannenkoek',emoji:'🥞',price:2.49,cat:'bakery'}
 ];
 
-let currentCategory='fruit';
-let cart=[];
-let total=0;
+const defaultResProducts = [
+  {id:101,name:'Tomatensoep',emoji:'🥣',price:4.50,cat:'voorgerecht'},
+  {id:102,name:'Stokbrood Kruidenboter',emoji:'🥖',price:3.75,cat:'voorgerecht'},
+  {id:103,name:'Kleine Salade',emoji:'🥗',price:3.99,cat:'voorgerecht'},
+  {id:104,name:'Nacho Chips',emoji:'🌮',price:4.25,cat:'voorgerecht'},
+  {id:105,name:'Luxe Burger',emoji:'🍔',price:8.95,cat:'hoofdgerecht'},
+  {id:106,name:'Pizza Margherita',emoji:'🍕',price:7.50,cat:'hoofdgerecht'},
+  {id:107,name:'Frietjes met Snack',emoji:'🍟',price:5.50,cat:'hoofdgerecht'},
+  {id:108,name:'Pannenkoek',emoji:'🥞',price:6.25,cat:'hoofdgerecht'},
+  {id:109,name:'Spaghetti',emoji:'🍝',price:7.95,cat:'hoofdgerecht'},
+  {id:110,name:'Hotdog',emoji:'🌭',price:4.99,cat:'hoofdgerecht'},
+  {id:111,name:'Ijsje met Spikkels',emoji:'🍦',price:2.50,cat:'toetje'},
+  {id:112,name:'Donut Pret',emoji:'🍩',price:1.99,cat:'toetje'},
+  {id:113,name:'Chocolade Cookie',emoji:'🍪',price:1.50,cat:'toetje'},
+  {id:114,name:'Stuk Taart',emoji:'🍰',price:3.50,cat:'toetje'},
+  {id:115,name:'Watermeloen Snack',emoji:'🍉',price:1.75,cat:'toetje'},
+  {id:116,name:'Frisdrank',emoji:'🥤',price:2.20,cat:'drankjes'},
+  {id:117,name:'Appelsap',emoji:'🧃',price:2.00,cat:'drankjes'},
+  {id:118,name:'Fris Water',emoji:'💧',price:1.50,cat:'drankjes'},
+  {id:119,name:'Warme Choco/Thee',emoji:'☕',price:2.50,cat:'drankjes'},
+  {id:120,name:'Milkshake',emoji:'🥛',price:2.95,cat:'drankjes'}
+];
 
-/* BEEP SOUND GENERATOR */
+// Product arrays inladen vanuit LocalStorage óf de defaults gebruiken
+let smProducts = JSON.parse(localStorage.getItem('smProducts')) || defaultSmProducts;
+let resProducts = JSON.parse(localStorage.getItem('resProducts')) || defaultResProducts;
+
+/* SOUND GENERATOR */
 function playBeep() {
   try {
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -670,26 +848,75 @@ function playBeep() {
     const gainNode = audioCtx.createGain();
 
     oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(1200, audioCtx.currentTime); // Hoge piep
-    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // Niet té hard
+    oscillator.frequency.setValueAtTime(activeApp === 'supermarket' ? 1200 : 1000, audioCtx.currentTime); 
+    gainNode.gain.setValueAtTime(activeApp === 'supermarket' ? 0.1 : 0.08, audioCtx.currentTime);
 
     oscillator.connect(gainNode);
     gainNode.connect(audioCtx.destination);
 
     oscillator.start();
-    // Korte piep van 0.08 seconden
     gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.08);
     oscillator.stop(audioCtx.currentTime + 0.08);
   } catch (e) {
-    console.log("Audio niet ondersteund of nog niet geactiveerd");
+    console.log("Audio niet geactiveerd");
   }
+}
+
+/* NAVIGATION ENGINE */
+function openApp(appName) {
+  activeApp = appName;
+  cart = [];
+  
+  document.getElementById('portalHome').classList.remove('active');
+  document.getElementById('supermarketView').classList.remove('active');
+  document.getElementById('restaurantView').classList.remove('active');
+  document.getElementById('adminView').classList.remove('active');
+
+  if(appName === 'supermarket') {
+    document.getElementById('supermarketView').classList.add('active');
+    currentCategory = 'fruit';
+  } else if(appName === 'restaurant') {
+    document.getElementById('restaurantView').classList.add('active');
+    currentCategory = 'voorgerecht';
+  }
+  
+  renderCategories();
+  renderProducts();
+  updateCart();
+}
+
+function openAdmin() {
+  activeApp = 'admin';
+  document.getElementById('portalHome').classList.remove('active');
+  document.getElementById('supermarketView').classList.remove('active');
+  document.getElementById('restaurantView').classList.remove('active');
+  document.getElementById('adminView').classList.add('active');
+  
+  updateAdminCategoryDropdown();
+  renderAdminProductsList();
+}
+
+function goHome() {
+  activeApp = 'portal';
+  cart = [];
+  
+  document.getElementById('supermarketView').classList.remove('active');
+  document.getElementById('restaurantView').classList.remove('active');
+  document.getElementById('adminView').classList.remove('active');
+  document.getElementById('portalHome').classList.add('active');
 }
 
 /* RENDER CATEGORIES */
 function renderCategories(){
-  const categoriesDiv=document.getElementById('categories');
+  if (activeApp === 'portal' || activeApp === 'admin') return;
 
-  categoriesDiv.innerHTML=categories.map(cat=>{
+  const containerId = activeApp === 'supermarket' ? 'smCategories' : 'resCategories';
+  const categoriesList = activeApp === 'supermarket' ? smCategories : resCategories;
+  const div = document.getElementById(containerId);
+
+  if (!div) return;
+
+  div.innerHTML = categoriesList.map(cat => {
     const isActive = cat.id === currentCategory ? 'active' : '';
     return `
       <button
@@ -702,25 +929,29 @@ function renderCategories(){
   }).join('');
 }
 
-/* SELECT CATEGORY */
 function selectCategory(id){
-  currentCategory=id;
+  currentCategory = id;
   renderCategories();
   renderProducts();
 }
 
 /* RENDER PRODUCTS */
 function renderProducts(){
-  const grid=document.getElementById('productsGrid');
-  const filtered=products.filter(p=>p.cat===currentCategory);
+  if (activeApp === 'portal' || activeApp === 'admin') return;
 
-  grid.innerHTML=filtered.map(product=>`
+  const gridId = activeApp === 'supermarket' ? 'smProductsGrid' : 'resProductsGrid';
+  const productsList = activeApp === 'supermarket' ? smProducts : resProducts;
+  const grid = document.getElementById(gridId);
+  
+  if (!grid) return;
+
+  const filtered = productsList.filter(p => p.cat === currentCategory);
+
+  grid.innerHTML = filtered.map(product => `
     <div class="product" onclick="addToCart(${product.id})">
-      <div class="emoji">${product.emoji}</div>
+      <div class="emoji">${product.emoji || '📦'}</div>
       <div class="name">${product.name}</div>
-      <div class="price">
-        €${product.price.toFixed(2)}
-      </div>
+      <div class="price">€${product.price.toFixed(2)}</div>
     </div>
   `).join('');
 }
@@ -728,19 +959,20 @@ function renderProducts(){
 /* ADD TO CART */
 function addToCart(id){
   playBeep();
-  const product=products.find(p=>p.id===id);
-  const existing=cart.find(item=>item.id===id);
+  const productsList = activeApp === 'supermarket' ? smProducts : resProducts;
+  const product = productsList.find(p => p.id === id);
+  const existing = cart.find(item => item.id === id);
 
   if(existing){
     existing.qty++;
-  }else{
-    cart.push({...product,qty:1});
+  } else {
+    cart.push({...product, qty: 1});
   }
 
   updateCart();
 }
 
-/* CHANGE QUANTITY VIA PLUS/MINUS */
+/* CHANGE QUANTITY */
 function changeQty(index, change) {
   playBeep();
   cart[index].qty += change;
@@ -754,43 +986,46 @@ function changeQty(index, change) {
 
 /* UPDATE CART */
 function updateCart(){
-  const cartItems=document.getElementById('cartItems');
-  const totalDiv=document.getElementById('total');
-  const count=document.getElementById('count');
-  const btn=document.getElementById('checkoutBtn');
+  if (activeApp === 'portal' || activeApp === 'admin') return;
 
-  total=0;
-  let qtyTotal=0;
+  const prefix = activeApp === 'supermarket' ? 'sm' : 'res';
+  const cartItems = document.getElementById(`${prefix}CartItems`);
+  const totalDiv = document.getElementById(`${prefix}Total`);
+  const count = document.getElementById(`${prefix}Count`);
+  const btn = document.getElementById(`${prefix}CheckoutBtn`);
 
-  if(cart.length===0){
-    cartItems.innerHTML=`
-      <div class="empty">
-        <div class="emoji">🛒</div>
-        <div>Scan producten!</div>
-      </div>
-    `;
-    totalDiv.textContent='€0,00';
-    count.textContent='0 items';
-    btn.disabled=true;
+  if (!cartItems || !totalDiv || !count || !btn) return;
+
+  total = 0;
+  let qtyTotal = 0;
+
+  if(cart.length === 0){
+    if(activeApp === 'supermarket') {
+      cartItems.innerHTML = `<div class="empty"><div class="emoji">🛒</div><div>Scan producten!</div></div>`;
+    } else {
+      cartItems.innerHTML = `<div class="empty"><div class="emoji">🍽️</div><div>Tik op het menu om te bestellen!</div></div>`;
+    }
+    totalDiv.textContent = '€0,00';
+    count.textContent = '0 items';
+    btn.disabled = true;
     return;
   }
 
-  btn.disabled=false;
+  btn.disabled = false;
 
-  cartItems.innerHTML=cart.map((item,index)=>{
+  cartItems.innerHTML = cart.map((item, index) => {
     total += item.price * item.qty;
     qtyTotal += item.qty;
 
     return `
       <div class="cart-item">
         <div class="left">
-          <div>${item.emoji}</div>
+          <div>${item.emoji || '📦'}</div>
           <div>${item.name}</div>
         </div>
 
         <div style="display:flex;align-items:center;gap:12px">
-          <div>€${(item.price*item.qty).toFixed(2)}</div>
-          
+          <div>€${(item.price * item.qty).toFixed(2)}</div>
           <div class="qty-controls">
             <button class="qty-btn" onclick="changeQty(${index}, -1)">-</button>
             <span class="qty">${item.qty}</span>
@@ -801,66 +1036,170 @@ function updateCart(){
     `;
   }).join('');
 
-  totalDiv.textContent=`€${total.toFixed(2)}`;
-  count.textContent=`${qtyTotal} items`;
+  totalDiv.textContent = `€${total.toFixed(2)}`;
+  count.textContent = `${qtyTotal} items`;
 }
 
-/* CLEAR */
+/* CLEAR CART */
 function clearCart(){
-  cart=[];
+  cart = [];
   updateCart();
 }
 
-/* CHECKOUT - OPEN PROFESSIONAL RECEIPT */
+/* CHECKOUT SYSTEM */
 function checkout(){
-  if(cart.length===0){
-    return;
-  }
+  if(cart.length === 0) return;
 
   const now = new Date();
-  
-  // Zet datum en tijd op de bon
   document.getElementById('receiptDate').textContent = now.toLocaleDateString('nl-NL');
   document.getElementById('receiptTime').textContent = now.toLocaleTimeString('nl-NL', {hour: '2-digit', minute:'2-digit'});
   
-  // Genereer willekeurig uniek bon nummer
-  document.getElementById('receiptId').textContent = 'BON-' + Math.floor(10000 + Math.random() * 90000);
-
   const tbody = document.getElementById('receiptItemsBody');
   let qtyTotal = 0;
   
-  // Bouw tabelrijen voor de bon op
   tbody.innerHTML = cart.map(item => {
     qtyTotal += item.qty;
     return `
       <tr>
-        <td>${item.emoji} ${item.name}</td>
+        <td>${item.emoji || '📦'} ${item.name}</td>
         <td style="text-align: center;">${item.qty}</td>
         <td style="text-align: right;">€${(item.price * item.qty).toFixed(2)}</td>
       </tr>
     `;
   }).join('');
 
-  // Vul totalen in op de bon
   document.getElementById('receiptTotalItems').textContent = qtyTotal;
   document.getElementById('receiptTotalPrice').textContent = `€${total.toFixed(2)}`;
 
-  // Open de professionele pop-up
+  if(activeApp === 'supermarket') {
+    document.getElementById('receiptStoreName').textContent = "🎪 LIZA'S SUPERMARKT";
+    document.getElementById('receiptStation').textContent = "Kassa #01 - Kids Playroom";
+    document.getElementById('receiptColHeader').textContent = "Product";
+    document.getElementById('receiptPaymentMethod').textContent = "Betaalwijze: Glimlach & Speelgeld 🌟";
+    document.getElementById('receiptId').textContent = 'BON-' + Math.floor(10000 + Math.random() * 90000);
+    document.getElementById('receiptFooterMsg').innerHTML = "Bedankt voor je bezoek! 👋<br>Kom snel nog eens winkelen!";
+    document.getElementById('receiptPrintBtn').className = "btn-receipt btn-print";
+    document.getElementById('receiptPrintBtn').style.background = "#764ba2";
+  } else {
+    document.getElementById('receiptStoreName').textContent = "🍳 LIZA'S RESTAURANT";
+    document.getElementById('receiptStation').textContent = "Tafel #05 - Bestel Terminal";
+    document.getElementById('receiptColHeader').textContent = "Gerecht";
+    document.getElementById('receiptPaymentMethod').textContent = "Betaalwijze: Smullen & Genieten! ✨";
+    document.getElementById('receiptId').textContent = 'ORDER-' + Math.floor(10000 + Math.random() * 90000);
+    document.getElementById('receiptFooterMsg').innerHTML = "Eet smakelijk! 👨‍🍳<br>De kok gaat meteen aan de slag!";
+    document.getElementById('receiptPrintBtn').className = "btn-receipt btn-print";
+    document.getElementById('receiptPrintBtn').style.background = "#ff4757";
+  }
+
   document.getElementById('receiptModal').classList.add('open');
 }
 
-/* CLOSE RECEIPT AND RESET CART */
 function closeReceipt(){
   document.getElementById('receiptModal').classList.remove('open');
-  cart=[];
+  cart = [];
   updateCart();
 }
 
-/* INIT */
-renderCategories();
-renderProducts();
-updateCart();
+/* ================= ADMIN MANAGEMENT CODE ================= */
+function updateAdminCategoryDropdown() {
+  const target = document.getElementById('addItemTarget').value;
+  const catSelect = document.getElementById('addItemCat');
+  const list = target === 'supermarket' ? smCategories : resCategories;
+  
+  if (catSelect) {
+    catSelect.innerHTML = list.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+  }
+}
 
+function renderAdminProductsList() {
+  const container = document.getElementById('adminItemList');
+  if (!container) return;
+  
+  let html = `<div style="font-weight:bold; margin: 10px 0 5px; color:#667eea">🛒 SUPERMARKT ITEMS:</div>`;
+  if(smProducts.length === 0) html += `<div style="font-style:italic; color:#aaa; padding:5px;">Geen items</div>`;
+  html += smProducts.map(p => {
+    const catName = smCategories.find(c => c.id === p.cat)?.name || p.cat;
+    return `
+      <div class="admin-item-row">
+        <div class="admin-row-left">
+          <div class="admin-row-emoji">${p.emoji || '📦'}</div>
+          <div>
+            <div class="admin-row-name">${p.name}</div>
+            <div class="admin-row-meta">${catName} • €${p.price.toFixed(2)}</div>
+          </div>
+        </div>
+        <button class="btn-delete-item" onclick="adminDeleteItem('supermarket', ${p.id})">✕</button>
+      </div>
+    `;
+  }).join('');
+
+  html += `<div style="font-weight:bold; margin: 20px 0 5px; color:#ff4757">🍔 RESTAURANT ITEMS:</div>`;
+  if(resProducts.length === 0) html += `<div style="font-style:italic; color:#aaa; padding:5px;">Geen items</div>`;
+  html += resProducts.map(p => {
+    const catName = resCategories.find(c => c.id === p.cat)?.name || p.cat;
+    return `
+      <div class="admin-item-row">
+        <div class="admin-row-left">
+          <div class="admin-row-emoji">${p.emoji || '📦'}</div>
+          <div>
+            <div class="admin-row-name">${p.name}</div>
+            <div class="admin-row-meta">${catName} • €${p.price.toFixed(2)}</div>
+          </div>
+        </div>
+        <button class="btn-delete-item" onclick="adminDeleteItem('restaurant', ${p.id})">✕</button>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = html;
+}
+
+function adminSaveItem() {
+  const target = document.getElementById('addItemTarget').value;
+  const cat = document.getElementById('addItemCat').value;
+  const name = document.getElementById('addItemName').value.trim();
+  const emoji = document.getElementById('addItemEmoji').value.trim();
+  const price = parseFloat(document.getElementById('addItemPrice').value);
+
+  if(!name || !emoji || isNaN(price)) {
+    alert("Vul alsjeblieft alle velden correct in! 😊");
+    return;
+  }
+
+  const newItem = {
+    id: Date.now(), // Unieke ID genereren op basis van tijdstip
+    name: name,
+    emoji: emoji,
+    price: price,
+    cat: cat
+  };
+
+  if(target === 'supermarket') {
+    smProducts.push(newItem);
+    localStorage.setItem('smProducts', JSON.stringify(smProducts));
+  } else {
+    resProducts.push(newItem);
+    localStorage.setItem('resProducts', JSON.stringify(resProducts));
+  }
+
+  // Velden leegmaken na opslaan
+  document.getElementById('addItemName').value = '';
+  document.getElementById('addItemEmoji').value = '';
+  document.getElementById('addItemPrice').value = '';
+
+  renderAdminProductsList();
+}
+
+function adminDeleteItem(target, id) {
+  if(target === 'supermarket') {
+    smProducts = smProducts.filter(p => p.id !== id);
+    localStorage.setItem('smProducts', JSON.stringify(smProducts));
+  } else {
+    resProducts = resProducts.filter(p => p.id !== id);
+    localStorage.setItem('resProducts', JSON.stringify(resProducts));
+  }
+  renderAdminProductsList();
+}
 </script>
 
 </body>
