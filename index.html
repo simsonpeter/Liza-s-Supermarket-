@@ -551,6 +551,36 @@ body{
 .btn-print { color: white; }
 .btn-close-modal { background: #dddddd; color: #333; }
 
+/* SHARED BILL ONLY MODE */
+body.shared-bill-only {
+  background: #f4f4f8;
+  padding: 0;
+}
+
+body.shared-bill-only .app {
+  display: none !important;
+}
+
+body.shared-bill-only .modal-overlay {
+  position: static;
+  width: 100%;
+  min-height: 100vh;
+  background: transparent;
+  backdrop-filter: none;
+  opacity: 1;
+  pointer-events: auto;
+  padding: 20px 10px;
+}
+
+body.shared-bill-only .receipt-container {
+  transform: none;
+  margin: 0 auto;
+}
+
+body.shared-bill-only .btn-close-modal {
+  display: none !important;
+}
+
 /* PRINT OPTIMIZATION */
 @media print {
   body * { visibility: hidden; }
@@ -792,6 +822,7 @@ let currentCategory = '';
 let cart = [];
 let total = 0;
 let sharedReceiptMode = false;
+let sharedBillOnlyMode = false;
 const BILL_QUERY_KEY = 'b';
 const LEGACY_BILL_QUERY_KEY = 'bill';
 const BILL_DATA_VERSION = 2;
@@ -1117,6 +1148,11 @@ function setReceiptFooterMessage(message) {
   });
 }
 
+function setSharedBillOnlyMode(enabled) {
+  sharedBillOnlyMode = Boolean(enabled);
+  document.body.classList.toggle('shared-bill-only', sharedBillOnlyMode);
+}
+
 function openSharedBillFromUrlIfAvailable() {
   const params = new URLSearchParams(window.location.search);
   const encodedBill = params.get(BILL_QUERY_KEY) || params.get(LEGACY_BILL_QUERY_KEY);
@@ -1146,6 +1182,7 @@ function openSharedBillFromUrlIfAvailable() {
   renderReceiptItems(items);
   applyReceiptTheme(appName);
   setReceiptShareUi(window.location.href, true, payload.billShareId);
+  setSharedBillOnlyMode(true);
 
   sharedReceiptMode = true;
   document.getElementById('receiptModal').classList.add('open');
@@ -1413,17 +1450,20 @@ function checkout(){
   };
   const shareUrl = buildBillShareUrl(sharePayload);
   setReceiptShareUi(shareUrl, false, billShareId);
+  setSharedBillOnlyMode(false);
   sharedReceiptMode = false;
 
   document.getElementById('receiptModal').classList.add('open');
 }
 
 function closeReceipt(){
-  document.getElementById('receiptModal').classList.remove('open');
-  if (sharedReceiptMode) {
-    clearBillShareParamFromUrl();
+  if (sharedBillOnlyMode) {
+    return;
   }
+
+  document.getElementById('receiptModal').classList.remove('open');
   sharedReceiptMode = false;
+  setSharedBillOnlyMode(false);
   cart = [];
   updateCart();
 }
