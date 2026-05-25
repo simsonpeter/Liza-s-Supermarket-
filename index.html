@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🛒 Kids Supermarkt Kassa</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+
+  body {
+    font-family: 'Segoe UI', 'Comic Sans MS', cursive, sans-serif;
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 8px;
+    gap: 8px;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  }
+
+  .header h1 {
+    color: white;
+    font-size: 1.5em;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+  }
+
+  .header .emoji-left { font-size: 1.8em; }
+
+  .clear-btn {
+    background: #ff4757;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 0.9em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .clear-btn:active { transform: scale(0.95); }
+
+  /* MAIN AREA */
+  .main-area {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* PRODUCTS GRID */
+  .products-panel {
+    flex: 1.4;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 0;
+  }
+
+  .category-tabs {
+    display: flex;
+    gap: 5px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .cat-tab {
+    padding: 8px 14px;
+    border-radius: 14px;
+    border: none;
+    font-size: 0.85em;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    color: white;
+  }
+  .cat-tab.active { transform: scale(1.05); box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    overflow-y: auto;
+    flex: 1;
+    padding: 4px;
+    align-content: start;
+  }
+
+  .product-btn {
+    background: white;
+    border: 3px solid transparent;
+    border-radius: 16px;
+    padding: 8px 4px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    transition: all 0.15s;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    min-height: 85px;
+  }
+  .product-btn:active {
+    transform: scale(0.92);
+    border-color: #667eea;
+  }
+  .product-btn .emoji { font-size: 2em; line-height: 1; }
+  .product-btn .name { font-size: 0.65em; font-weight: bold; color: #444; text-align: center; line-height: 1.1; }
+  .product-btn .price { font-size: 0.7em; color: #667eea; font-weight: bold; }
+
+  /* CART PANEL */
+  .cart-panel {
+    flex: 1;
+    background: white;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    min-height: 0;
+  }
+
+  .cart-header {
+    padding: 10px 14px;
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #764ba2;
+    border-bottom: 2px dashed #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .cart-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px 10px;
+  }
+
+  .cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 8px;
+    border-radius: 10px;
+    margin-bottom: 4px;
+    background: #f8f9ff;
+    animation: slideIn 0.2s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .cart-item .ci-left { display: flex; align-items: center; gap: 6px; }
+  .cart-item .ci-emoji { font-size: 1.3em; }
+  .cart-item .ci-name { font-size: 0.8em; font-weight: 600; color: #333; }
+  .cart-item .ci-qty {
+    background: #667eea;
+    color: white;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7em;
+    font-weight: bold;
+  }
+  .cart-item .ci-price { font-weight: bold; color: #764ba2; font-size: 0.85em; }
+  .cart-item .ci-remove {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 0.8em;
+    cursor: pointer;
+    margin-left: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cart-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #ccc;
+    font-size: 0.9em;
+  }
+  .cart-empty .big-emoji { font-size: 3em; margin-bottom: 8px; }
+
+  .cart-total {
+    padding: 12px 14px;
+    border-top: 2px dashed #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .cart-total .total-label { font-size: 1em; color: #666; font-weight: 600; }
+  .cart-total .total-amount { font-size: 1.6em; font-weight: bold; color: #764ba2; }
+
+  .pay-btn {
+    margin: 0 10px 10px;
+    padding: 14px;
+    background: linear-gradient(135deg, #11998e, #38ef7d);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s;
+    box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+  }
+  .pay-btn:active { transform: scale(0.97); }
+  .pay-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
+
+  /* OVERLAY / PAYMENT MODAL */
+  .overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(4px);
+  }
+  .overlay.show { display: flex; }
+
+  .modal {
+    background: white;
+    border-radius: 24px;
+    padding: 24px;
+    width: 90%;
+    max-width: 420px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: modalPop 0.3s ease;
+  }
+
+  @keyframes modalPop {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .modal h2 {
+    text-align: center;
+    color: #764ba2;
+    margin-bottom: 6px;
+    font-size: 1.4em;
+  }
+
+  .modal .total-display {
+    text-align: center;
+    font-size: 2.2em;
+    font-weight: bold;
+    color: #333;
+    margin: 10px 0;
+  }
+
+  .modal .change-display {
+    text-align: center;
+    font-size: 1.1em;
+    color: #11998e;
+    font-weight: bold;
+    min-height: 1.5em;
+    margin-bottom: 10px;
+  }
+
+  .money-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .money-btn {
+    padding: 14px 8px;
+    border: 3px solid #e0e0e0;
+    border-radius: 14px;
+    background: white;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    font-weight: bold;
+  }
+  .money-btn:active { transform: scale(0.93); }
+  .money-btn .m-emoji { font-size: 1.6em; display: block; }
+  .money-btn .m-value { font-size: 0.9em; color: #333; }
+  .money-btn.coin { border-color: #ffd700; background: #fffde7; }
+  .money-btn.bill { border-color: #81c784; background: #e8f5e9; }
+
+  .paid-section {
+    background: #f0f0f0;
+    border-radius: 14px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .paid-section span { font-weight: bold; font-size: 1.1em; }
+
+  .modal-buttons {
+    display: flex;
+    gap: 8px;
+  }
+  .modal-buttons button {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 14px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .modal-buttons button:active { transform: scale(0.95); }
+  .btn-cancel { background: #ff6b6b; color: white; }
+  .btn-confirm { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; }
+
+  /* RECEIPT MODAL */
+  .receipt {
+    background: #fff;
+    border: 2px dashed #ccc;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 10px 0;
+    font-family: 'Courier New', monospace;
+  }
+  .receipt .r-header { text-align: center; font-size: 0.85em; color: #888; margin-bottom: 8px; }
+  .receipt .r-line { border-top: 1px dashed #ccc; margin: 6px 0; }
+  .receipt .r-item { display: flex; justify-content: space-between; font-size: 0.8em; padding: 2px 0; }
+  .receipt .r-total { font-weight: bold; font-size: 1em; margin-top: 4px; }
+  .receipt .r-footer { text-align: center; font-size: 0.75em; color: #aaa; margin-top: 8px; }
+  .receipt .r-thanks { font-size: 1.3em; text-align: center; margin: 10px 0; }
+
+  .confetti-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 200;
+  }
+
+  .confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    animation: confettiFall linear forwards;
+  }
+
+  @keyframes confettiFall {
+    0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* Quantity popup */
+  .qty-popup {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    z-index: 150;
+    display: none;
+    text-align: center;
+    animation: modalPop 0.2s ease forwards;
+  }
+  .qty-popup.show { display: block; }
+  .qty-popup .qp-emoji { font-size: 3em; }
+  .qty-popup .qp-name { font-weight: bold; margin: 4px 0; }
+  .qty-popup .qp-controls { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 12px 0; }
+  .qty-popup .qp-btn {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: none;
+    font-size: 1.4em;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .qp-btn.minus { background: #ff6b6b; color: white; }
+  .qp-btn.plus { background: #38ef7d; color: white; }
+  .qty-popup .qp-count { font-size: 2em; font-weight: bold; min-width: 40px; }
+  .qty-popup .qp-add {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .main-area { flex-direction: column; }
+    .cart-panel { max-height: 45vh; }
+    .products-grid { grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); }
+    .product-btn { min-height: 75px; }
+    .product-btn .emoji { font-size: 1.6em; }
+    .header h1 { font-size: 1.1em; }
+    .money-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <div class="header">
+    <span class="emoji-left">🛒</span>
+    <h1>Kids Supermarkt Kassa</h1>
+    <button class="clear-btn" onclick="clearCart()">🗑️ Wis</button>
+  </div>
+
+  <div class="main-area">
+    <div class="products-panel">
+      <div class="category-tabs" id="categoryTabs"></div>
+      <div class="products-grid" id="productsGrid"></div>
+    </div>
+
+    <div class="cart-panel">
+      <div class="cart-header">
+        <span>🧾 Winkelwagentje</span>
+        <span id="cartCount">0 items</span>
+      </div>
+      <div class="cart-items" id="cartItems">
+        <div class="cart-empty">
+          <div class="big-emoji">🛒</div>
+          <div>Scan producten!</div>
+        </div>
+      </div>
+      <div class="cart-total">
+        <span class="total-label">Totaal:</span>
+        <span class="total-amount" id="totalAmount">€0,00</span>
+      </div>
+      <button class="pay-btn" id="payBtn" onclick="openPayment()" disabled>💰 Afrekenen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="overlay" id="paymentOverlay">
+  <div class="modal">
+    <h2>💰 Afrekenen</h2>
+    <div class="total-display" id="payTotal">€0,00</div>
+    <div class="change-display" id="changeDisplay"></div>
+    <div class="money-grid" id="moneyGrid"></div>
+    <div class="paid-section">
+      <span>Gegeven:</span>
+      <span id="paidAmount">€0,00</span>
+    </div>
+    <div class="modal-buttons">
+      <button class="btn-cancel" onclick="closePayment()">❌ Annuleren</button>
+      <button class="btn-confirm" id="confirmBtn" onclick="confirmPayment()" disabled>✅ Betalen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Receipt Modal -->
+<div class="overlay" id="receiptOverlay">
+  <div class="modal">
+    <h2>🎉 Betaald!</h2>
+    <div class="receipt" id="receiptContent"></div>
+    <div class="modal-buttons">
+      <button class="btn-confirm" onclick="closeReceipt()" style="width:100%">🆕 Nieuwe Klant</button>
+    </div>
+  </div>
+</div>
+
+<!-- Quantity Popup -->
+<div class="qty-popup" id="qtyPopup">
+  <div class="qp-emoji" id="qpEmoji"></div>
+  <div class="qp-name" id="qpName"></div>
+  <div class="qp-controls">
+    <button class="qp-btn minus" onclick="changeQty(-1)">−</button>
+    <div class="qp-count" id="qpCount">1</div>
+    <button class="qp-btn plus" onclick="changeQty(1)">+</button>
+  </div>
+  <button class="qp-add" onclick="addToCart()">🛒 Toevoegen!</button>
+</div>
+
+<div class="confetti-container" id="confettiContainer"></div>
+
+<script>
+// === DATA ===
+const categories = [
+  { id: 'fruit', name: '🍎 Fruit', color: '#ff6b6b' },
+  { id: 'groente', name: '🥦 Groente', color: '#38ef7d' },
+  { id: 'zuivel', name: '🧀 Zuivel', color: '#ffd700' },
+  { id: 'drank', name: '🥤 Drank', color: '#667eea' },
+  { id: 'snoep', name: '🍬 Snoep', color: '#ff9ff3' },
+  { id: 'brood', name: '🍞 Brood', color: '#f39c12' },
+];
+
+const products = [
+  // Fruit
+  { id: 1, name: 'Appel', emoji: '🍎', price: 0.79, cat: 'fruit' },
+  { id: 2, name: 'Banaan', emoji: '🍌', price: 0.69, cat: 'fruit' },
+  { id: 3, name: 'Sinaasappel', emoji: '🍊', price: 0.89, cat: 'fruit' },
+  { id: 4, name: 'Grapen', emoji: '🍇', price: 1.49, cat: 'fruit' },
+  { id: 5, name: 'Watermeloen', emoji: '🍉', price: 3.99, cat: 'fruit' },
+  { id: 6, name: 'Strawberry', emoji: '🍓', price: 1.99, cat: 'fruit' },
+  // Groente
+  { id: 7, name: 'Wortel', emoji: '🥕', price: 0.99, cat: 'groente' },
+  { id: 8, name: 'Broccoli', emoji: '🥦', price: 1.29, cat: 'groente' },
+  { id: 9, name: 'Tomaat', emoji: '🍅', price: 0.89, cat: 'groente' },
+  { id: 10, name: 'Aardappel', emoji: '🥔', price: 1.49, cat: 'groente' },
+  { id: 11, name: 'Maïs', emoji: '🌽', price: 0.79, cat: 'groente' },
+  { id: 12, name: 'Paprika', emoji: '🫑', price: 1.19, cat: 'groente' },
+  // Zuivel
+  { id: 13, name: 'Melk', emoji: '🥛', price: 1.09, cat: 'zuivel' },
+  { id: 14, name: 'Kaas', emoji: '🧀', price: 2.49, cat: 'zuivel' },
+  { id: 15, name: 'Yoghurt', emoji: '🫙', price: 0.99, cat: 'zuivel' },
+  { id: 16, name: 'Boter', emoji: '🧈', price: 1.79, cat: 'zuivel' },
+  { id: 17, name: 'Roomijs', emoji: '🍦', price: 2.99, cat: 'zuivel' },
+  // Drank
+  { id: 18, name: 'Water', emoji: '💧', price: 0.49, cat: 'drank' },
+  { id: 19, name: 'Jus d\'orange', emoji: '🧃', price: 1.49, cat: 'drank' },
+  { id: 20, name: 'Cola', emoji: '🥤', price: 1.29, cat: 'drank' },
+  { id: 21, name: 'Thee', emoji: '🍵', price: 0.99, cat: 'drank' },
+  // Snoep
+  { id: 22, name: 'Snoep', emoji: '🍬', price: 0.99, cat: 'snoep' },
+  { id: 23, name: 'Chocolade', emoji: '🍫', price: 1.49, cat: 'snoep' },
+  { id: 24, name: 'Cookie', emoji: '🍪', price: 0.79, cat: 'snoep' },
+  { id: 25, name: 'Donut', emoji: '🍩', price: 1.29, cat: 'snoep' },
+  { id: 26, name: 'Lolly', emoji: '🍭', price: 0.59, cat: 'snoep' },
+  // Brood
+  { id: 27, name: 'Brood', emoji: '🍞', price: 1.49, cat: 'brood' },
+  { id: 28, name: 'Croissant', emoji: '🥐', price: 0.99, cat: 'brood' },
+  { id: 29, name: 'Bagel', emoji: '🥯', price: 0.89, cat: 'brood' },
+  { id: 30, name: 'Pannenkoek', emoji: '🥞', price: 1.99, cat: 'brood' },
+];
+
+const moneyOptions = [
+  { value: 0.05, emoji: '🪙', type: 'coin', label: '5 cent' },
+  { value: 0.10, emoji: '🪙', type: 'coin', label: '10 cent' },
+  { value: 0.20, emoji: '🪙', type: 'coin', label: '20 cent' },
+  { value: 0.50, emoji: '🪙', type: 'coin', label: '50 cent' },
+  { value: 1.00, emoji: '🪙', type: 'coin', label: '€1' },
+  { value: 2.00, emoji: '🪙', type: 'coin', label: '€2' },
+  { value: 5.00, emoji: '💵', type: 'bill', label: '€5' },
+  { value: 10.00, emoji: '💵', type: 'bill', label: '€10' },
+  { value: 20.00, emoji: '💵', type: 'bill', label: '€20' },
+];
+
+// === STATE ===
+let cart = [];
+let total = 0;
+let currentCategory = 'fruit';
+let selectedProduct = null;
+let qtyPopupCount = 1;
+let paidAmount = 0;
+
+// === AUDIO ===
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playSound(freq, type, duration) {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + duration);
+}
+
+function playBeep() { playSound(800, 'sine', 0.1); }
+function playAdd() { playSound(600, 'sine', 0.08); setTimeout(() => playSound(900, 'sine', 0.12), 80); }
+function playRemove() { playSound(400, 'triangle', 0.15); }
+function playPay() { playSound(523, 'sine', 0.1); setTimeout(() => playSound(659, 'sine', 0.1), 100); setTimeout(() => playSound(784, 'sine', 0.15), 200); }
+function playSuccess() {
+  [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => playSound(f, 'sine', 0.2), i * 120));
+}
+
+// === RENDER ===
+function renderCategories() {
+  const tabs = document.getElementById('categoryTabs');
+  tabs.innerHTML = categories.map(c =>
+    `<button class="cat-tab ${c.id === currentCategory ? 'active' : ''}"
+      style="background:${c.color}" onclick="selectCategory('${c.id}')">${c.name}</button>`
+  ).join('');
+}
+
+function selectCategory(catId) {
+  currentCategory = catId;
+  renderCategories();
+  renderProducts();
+}
+
+function renderProducts() {
+  const grid = document.getElementById('productsGrid');
+  const filtered = products.filter(p => p.cat === currentCategory);
+  grid.innerHTML = filtered.map(p =>
+    `<button class="product-btn" onclick="selectProduct(${p.id})">
+      <span class="emoji">${p.emoji}</span>
+      <span class="name">${p.name}</span>
+      <span class="price">€${p.price.toFixed(2).replace('.', ',')}</span>
+    </button>`
+  ).join('');
+}
+
+function renderCart() {
+  const container = document.getElementById('cartItems');
+  const countEl = document.getElementById('cartCount');
+  const totalEl = document.getElementById('totalAmount');
+  const payBtn = document.getElementById('payBtn');
+
+  if (cart.length === 0) {
+    container.innerHTML = `<div class="cart-empty"><div class="big-emoji">🛒</div><div>Scan producten!</div></div>`;
+    countEl.textContent = '0 items';
+    totalEl.textContent = '€0,00';
+    payBtn.disabled = true;
+    return;
+  }
+
+  const totalItems = cart.reduce((s, c) => s + c.qty, 0);
+  countEl.textContent = `${totalItems} item${totalItems > 1 ? 's' : ''}`;
+  totalEl.textContent = `€${total.toFixed(2).replace('.', ',')}`;
+  payBtn.disabled = false;
+
+  container.innerHTML = cart.map((c, i) =>
+    `<div class="cart-item">
+      <div class="ci-left">
+        <span class="ci-emoji">${c.emoji}</span>
+        <span class="ci-name">${c.name}</span>
+        <span class="ci-qty">${c.qty}</span>
+      </div>
+      <span class="ci-price">€${(c.price * c.qty).toFixed(2).replace('.', ',')}</span>
+      <button class="ci-remove" onclick="removeFromCart(${i})">✕</button>
+    </div>`
+  ).join('');
+}
+
+// === ACTIONS ===
+function selectProduct(id) {
+  selectedProduct = products.find(p => p.id === id);
+  qtyPopupCount = 1;
+  document.getElementById('qpEmoji').textContent = selectedProduct.emoji;
+  document.getElementById('qpName').textContent = selectedProduct.name;
+  document.getElementById('qpCount').textContent = qtyPopupCount;
+  document.getElementById('qtyPopup').classList.add('show');
+  playBeep();
+}
+
+function changeQty(delta) {
+  qtyPopupCount = Math.max(1, Math.min(99, qtyPopupCount + delta));
+  document.getElementById('qpCount').textContent = qtyPopupCount;
+  playBeep();
+}
+
+function addToCart() {
+  if (!selectedProduct) return;
+  const existing = cart.find(c => c.id === selectedProduct.id);
+  if (existing) {
+    existing.qty += qtyPopupCount;
+  } else {
+    cart.push({ ...selectedProduct, qty: qtyPopupCount });
+  }
+  recalcTotal();
+  renderCart();
+  document.getElementById('qtyPopup').classList.remove('show');
+  playAdd();
+}
+
+function removeFromCart(index) {
+  cart.splice(index, 1);
+  recalcTotal();
+  renderCart();
+  playRemove();
+}
+
+function recalcTotal() {
+  total = cart.reduce((s, c) => s + c.price * c.qty, 0);
+}
+
+function clearCart() {
+  if (cart.length === 0) return;
+  cart = [];
+  total = 0;
+  renderCart();
+  playRemove();
+}
+
+// === PAYMENT ===
+function openPayment() {
+  paidAmount = 0;
+  document.getElementById('payTotal').textContent = `€${total.toFixed(2).replace('.', ',')}`;
+  document.getElementById('paidAmount').textContent = '€0,00';
+  document.getElementById('changeDisplay').textContent = '';
+  document.getElementById('confirmBtn').disabled = true;
+  renderMoneyGrid();
+  document.getElementById('paymentOverlay').classList.add('show');
+}
+
+function renderMoneyGrid() {
+  const grid = document.getElementById('moneyGrid');
+  grid.innerHTML = moneyOptions.map(m =>
+    `<button class="money-btn ${m.type}" onclick="addMoney(${m.value})">
+      <span class="m-emoji">${m.emoji}</span>
+      <span class="m-value">${m.label}</span>
+    </button>`
+  ).join('');
+}
+
+function addMoney(value) {
+  paidAmount = Math.round((paidAmount + value) * 100) / 100;
+  document.getElementById('paidAmount').textContent = `€${paidAmount.toFixed(2).replace('.', ',')}`;
+  playBeep();
+
+  if (paidAmount >= total) {
+    const change = Math.round((paidAmount - total) * 100) / 100;
+    document.getElementById('changeDisplay').textContent = change > 0
+      ? `Wisselgeld: €${change.toFixed(2).replace('.', ',')}`
+      : 'Precies goed! 🎯';
+    document.getElementById('confirmBtn').disabled = false;
+  } else {
+    document.getElementById('changeDisplay').textContent = `Nog €${(total - paidAmount).toFixed(2).replace('.', ',')} nodig`;
+    document.getElementById('confirmBtn').disabled = true;
+  }
+}
+
+function confirmPayment() {
+  closePayment();
+  playSuccess();
+  showReceipt();
+  launchConfetti();
+}
+
+function closePayment() {
+  document.getElementById('paymentOverlay').classList.remove('show');
+}
+
+function showReceipt() {
+  const change = Math.round((paidAmount - total) * 100) / 100;
+  const receipt = document.getElementById('receiptContent');
+  let html = `
+    <div class="r-header">🛒 Kids Supermarkt<br>-------------------</div>
+  `;
+  cart.forEach(c => {
+    html += `<div class="r-item"><span>${c.emoji} ${c.name} x${c.qty}</span><span>€${(c.price * c.qty).toFixed(2).replace('.', ',')}</span></div>`;
+  });
+  html += `<div class="r-line"></div>`;
+  html += `<div class="r-item r-total"><span>TOTAAL</span><span>€${total.toFixed(2).replace('.', ',')}</span></div>`;
+  html += `<div class="r-item"><span>Gegeven</span><span>€${paidAmount.toFixed(2).replace('.', ',')}</span></div>`;
+  html += `<div class="r-item"><span>Wisselgeld</span><span>€${change.toFixed(2).replace('.', ',')}</span></div>`;
+  html += `<div class="r-thanks">Bedankt! 😊</div>`;
+  html += `<div class="r-footer">Tot de volgende keer!</div>`;
+  receipt.innerHTML = html;
+  document.getElementById('receiptOverlay').classList.add('show');
+}
+
+function closeReceipt() {
+  document.getElementById('receiptOverlay').classList.remove('show');
+  cart = [];
+  total = 0;
+  paidAmount = 0;
+  renderCart();
+}
+
+// === CONFETTI ===
+function launchConfetti() {
+  const container = document.getElementById('confettiContainer');
+  const colors = ['#ff6b6b', '#ffd700', '#38ef7d', '#667eea', '#ff9ff3', '#f39c12', '#00d2d3'];
+  for (let i = 0; i < 60; i++) {
+    const confetti = document.createElement('div');
+    confetti.className = 'confetti';
+    confetti.style.left = Math.random() * 100 + '%';
+    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+    confetti.style.animationDuration = (2 + Math.random() * 2) + 's';
+    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+    confetti.style.width = (6 + Math.random() * 8) + 'px';
+    confetti.style.height = (6 + Math.random() * 8) + 'px';
+    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    container.appendChild(confetti);
+  }
+  setTimeout(() => container.innerHTML = '', 4000);
+}
+
+// === INIT ===
+renderCategories();
+renderProducts();
+renderCart();
+</script>
+</body>
+</html>
