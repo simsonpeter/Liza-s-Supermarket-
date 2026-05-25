@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>🛒 Kids Supermarkt Kassa</title>
 
 <style>
@@ -10,341 +10,293 @@
   margin:0;
   padding:0;
   box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-  user-select:none;
+  font-family:'Segoe UI',sans-serif;
 }
 
 body{
-  font-family:'Segoe UI','Comic Sans MS',cursive,sans-serif;
-  background:linear-gradient(135deg,#ffecd2 0%,#fcb69f 100%);
+  background:linear-gradient(135deg,#ffecd2,#fcb69f);
   min-height:100vh;
   overflow-x:hidden;
-  overflow-y:auto;
 }
 
-/* APP */
-.app-container{
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
-  max-width:900px;
-  margin:0 auto;
-  padding:8px;
-  gap:8px;
+.app{
+  max-width:1200px;
+  margin:auto;
+  padding:10px;
 }
 
 /* HEADER */
 .header{
-  background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  color:white;
+  padding:14px 20px;
   border-radius:20px;
-  padding:10px 20px;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  box-shadow:0 4px 15px rgba(102,126,234,.4);
+  margin-bottom:10px;
 }
 
 .header h1{
-  color:white;
-  font-size:1.5em;
+  font-size:1.4rem;
 }
 
 .clear-btn{
-  background:#ff4757;
+  background:#ff4d6d;
   color:white;
   border:none;
-  padding:8px 16px;
-  border-radius:12px;
-  font-size:.9em;
-  font-weight:bold;
+  padding:10px 16px;
+  border-radius:14px;
   cursor:pointer;
+  font-weight:bold;
 }
 
 /* MAIN */
-.main-area{
+.main{
   display:flex;
-  gap:8px;
-  flex:1;
-  min-height:0;
+  gap:10px;
 }
 
 /* PRODUCTS */
-.products-panel{
-  flex:1.4;
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  min-height:0;
+.products-section{
+  flex:1.5;
 }
 
-.category-tabs{
+.categories{
   display:flex;
-  gap:5px;
+  gap:8px;
+  margin-bottom:10px;
   overflow-x:auto;
-  padding-bottom:4px;
 }
 
-.cat-tab{
-  padding:8px 14px;
-  border-radius:14px;
+.category-btn{
   border:none;
-  font-size:.85em;
-  font-weight:bold;
-  cursor:pointer;
-  white-space:nowrap;
   color:white;
+  padding:10px 16px;
+  border-radius:14px;
+  cursor:pointer;
+  font-weight:bold;
+  white-space:nowrap;
 }
 
 .products-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(90px,1fr));
-  gap:6px;
-  overflow-y:auto;
-  flex:1;
-  padding:4px;
+  grid-template-columns:repeat(auto-fill,minmax(110px,1fr));
+  gap:10px;
+  align-content:start;
 }
 
-.product-btn{
+.product{
   background:white;
-  border-radius:16px;
-  padding:8px 4px;
-  border:none;
+  border-radius:18px;
+  padding:10px;
+  text-align:center;
   cursor:pointer;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
+  transition:.15s;
+  height:110px;
+
   display:flex;
   flex-direction:column;
-  align-items:center;
   justify-content:center;
-  gap:2px;
-  box-shadow:0 3px 10px rgba(0,0,0,.08);
-  min-height:85px;
+  align-items:center;
 }
 
-.product-btn .emoji{
-  font-size:2em;
+.product:active{
+  transform:scale(.95);
 }
 
-.product-btn .name{
-  font-size:.65em;
-  font-weight:bold;
-  text-align:center;
+.product .emoji{
+  font-size:2rem;
 }
 
-.product-btn .price{
-  font-size:.7em;
+.product .name{
+  font-size:.8rem;
+  font-weight:600;
+}
+
+.product .price{
   color:#667eea;
   font-weight:bold;
+  font-size:.8rem;
 }
 
 /* CART */
-.cart-panel{
+.cart{
   flex:1;
   background:white;
   border-radius:20px;
   display:flex;
   flex-direction:column;
+  overflow:hidden;
   box-shadow:0 4px 20px rgba(0,0,0,.1);
-  min-height:0;
+  min-height:500px;
 }
 
 .cart-header{
-  padding:10px 14px;
-  font-weight:bold;
-  font-size:1.1em;
-  color:#764ba2;
+  padding:14px;
   border-bottom:2px dashed #eee;
   display:flex;
   justify-content:space-between;
+  font-weight:bold;
+  color:#764ba2;
 }
 
 .cart-items{
   flex:1;
   overflow-y:auto;
-  padding:6px 10px;
+  padding:10px;
 }
 
-.cart-empty{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+.empty{
   height:100%;
-  color:#ccc;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  color:#bbb;
 }
 
-.big-emoji{
-  font-size:3em;
-  margin-bottom:8px;
+.empty .emoji{
+  font-size:3rem;
+  margin-bottom:10px;
 }
 
 .cart-item{
+  background:#f8f9ff;
+  padding:10px;
+  border-radius:12px;
+  margin-bottom:8px;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:6px 8px;
-  border-radius:10px;
-  margin-bottom:4px;
-  background:#f8f9ff;
 }
 
-.ci-left{
+.left{
   display:flex;
   align-items:center;
-  gap:6px;
+  gap:8px;
 }
 
-.ci-emoji{
-  font-size:1.3em;
-}
-
-.ci-name{
-  font-size:.8em;
-  font-weight:600;
-}
-
-.ci-qty{
+.qty{
   background:#667eea;
   color:white;
-  border-radius:50%;
   width:22px;
   height:22px;
+  border-radius:50%;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:.7em;
+  font-size:.75rem;
 }
 
-.ci-price{
-  font-weight:bold;
-  color:#764ba2;
-  font-size:.85em;
-}
-
-.ci-remove{
+.remove{
+  border:none;
   background:#ff6b6b;
   color:white;
-  border:none;
+  width:24px;
+  height:24px;
   border-radius:50%;
-  width:22px;
-  height:22px;
   cursor:pointer;
 }
 
-.cart-total{
-  padding:12px 14px;
+.total{
+  padding:14px;
   border-top:2px dashed #eee;
   display:flex;
   justify-content:space-between;
   align-items:center;
 }
 
-.total-amount{
-  font-size:1.6em;
+.total-price{
+  font-size:1.6rem;
   font-weight:bold;
   color:#764ba2;
 }
 
-.pay-btn{
-  margin:0 10px 10px;
-  padding:14px;
+.checkout{
+  margin:0 12px 12px;
+  border:none;
   background:linear-gradient(135deg,#11998e,#38ef7d);
   color:white;
-  border:none;
+  padding:16px;
   border-radius:16px;
-  font-size:1.2em;
+  font-size:1rem;
   font-weight:bold;
   cursor:pointer;
-  box-shadow:0 4px 15px rgba(17,153,142,.4);
 }
 
-.pay-btn:disabled{
-  opacity:.4;
+.checkout:disabled{
+  opacity:.5;
+  cursor:not-allowed;
 }
 
-/* MOBILE FIX */
-@media (max-width:600px){
+/* MOBILE */
+@media(max-width:800px){
 
-  .main-area{
+  .main{
     flex-direction:column;
-    overflow-y:auto;
+  }
+
+  .cart{
+    min-height:350px;
   }
 
   .products-grid{
-    grid-template-columns:repeat(auto-fill,minmax(75px,1fr));
+    grid-template-columns:repeat(auto-fill,minmax(90px,1fr));
   }
 
-  .product-btn{
-    min-height:75px;
+  .product{
+    height:95px;
   }
-
-  .product-btn .emoji{
-    font-size:1.6em;
-  }
-
-  .header h1{
-    font-size:1.1em;
-  }
-
-  .cart-panel{
-    min-height:260px;
-    max-height:none;
-  }
-
-  .pay-btn{
-    position:sticky;
-    bottom:10px;
-    z-index:20;
-  }
-}
-
-/* SCROLLBAR */
-::-webkit-scrollbar{
-  width:6px;
-}
-
-::-webkit-scrollbar-thumb{
-  background:#ccc;
-  border-radius:3px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="app-container">
+<div class="app">
 
+  <!-- HEADER -->
   <div class="header">
-    <span>🛒</span>
-    <h1>Kids Supermarkt Kassa</h1>
+    <h1>🛒 Kids Supermarkt Kassa</h1>
     <button class="clear-btn" onclick="clearCart()">🗑️ Wis</button>
   </div>
 
-  <div class="main-area">
+  <div class="main">
 
-    <div class="products-panel">
-      <div class="category-tabs" id="categoryTabs"></div>
+    <!-- PRODUCTS -->
+    <div class="products-section">
+
+      <div class="categories" id="categories"></div>
+
       <div class="products-grid" id="productsGrid"></div>
+
     </div>
 
-    <div class="cart-panel">
+    <!-- CART -->
+    <div class="cart">
 
       <div class="cart-header">
         <span>🧾 Winkelwagentje</span>
-        <span id="cartCount">0 items</span>
+        <span id="count">0 items</span>
       </div>
 
       <div class="cart-items" id="cartItems">
-        <div class="cart-empty">
-          <div class="big-emoji">🛒</div>
+
+        <div class="empty">
+          <div class="emoji">🛒</div>
           <div>Scan producten!</div>
         </div>
+
       </div>
 
-      <div class="cart-total">
+      <div class="total">
         <span>Totaal:</span>
-        <span class="total-amount" id="totalAmount">€0,00</span>
+        <span class="total-price" id="total">€0,00</span>
       </div>
 
-      <button class="pay-btn" id="payBtn" disabled>
+      <button class="checkout" id="checkoutBtn" onclick="checkout()" disabled>
         💰 Afrekenen
       </button>
 
@@ -355,138 +307,265 @@ body{
 </div>
 
 <script>
+
+/* CATEGORIES */
 const categories = [
+
   {id:'fruit',name:'🍎 Fruit',color:'#ff6b6b'},
   {id:'groente',name:'🥦 Groente',color:'#38ef7d'},
+  {id:'drank',name:'🥤 Drank',color:'#667eea'},
   {id:'zuivel',name:'🧀 Zuivel',color:'#ffd700'},
-  {id:'drank',name:'🥤 Drank',color:'#667eea'}
+  {id:'snacks',name:'🍩 Snacks',color:'#ff9ff3'},
+  {id:'bakery',name:'🥐 Bakkerij',color:'#f39c12'}
+
 ];
 
+/* PRODUCTS */
 const products = [
+
+  /* FRUIT */
   {id:1,name:'Appel',emoji:'🍎',price:0.79,cat:'fruit'},
   {id:2,name:'Banaan',emoji:'🍌',price:0.69,cat:'fruit'},
-  {id:3,name:'Broccoli',emoji:'🥦',price:1.29,cat:'groente'},
-  {id:4,name:'Tomaat',emoji:'🍅',price:0.89,cat:'groente'},
-  {id:5,name:'Melk',emoji:'🥛',price:1.09,cat:'zuivel'},
-  {id:6,name:'Kaas',emoji:'🧀',price:2.49,cat:'zuivel'},
-  {id:7,name:'Water',emoji:'💧',price:0.49,cat:'drank'},
-  {id:8,name:'Cola',emoji:'🥤',price:1.29,cat:'drank'}
+  {id:3,name:'Aardbei',emoji:'🍓',price:1.49,cat:'fruit'},
+  {id:4,name:'Watermeloen',emoji:'🍉',price:3.99,cat:'fruit'},
+  {id:5,name:'Druiven',emoji:'🍇',price:2.49,cat:'fruit'},
+  {id:6,name:'Ananas',emoji:'🍍',price:2.99,cat:'fruit'},
+
+  /* GROENTE */
+  {id:7,name:'Broccoli',emoji:'🥦',price:1.29,cat:'groente'},
+  {id:8,name:'Tomaat',emoji:'🍅',price:0.89,cat:'groente'},
+  {id:9,name:'Wortel',emoji:'🥕',price:0.99,cat:'groente'},
+  {id:10,name:'Maïs',emoji:'🌽',price:1.19,cat:'groente'},
+  {id:11,name:'Paprika',emoji:'🫑',price:1.49,cat:'groente'},
+
+  /* DRINKS */
+  {id:12,name:'Water',emoji:'💧',price:0.49,cat:'drank'},
+  {id:13,name:'Cola',emoji:'🥤',price:1.29,cat:'drank'},
+  {id:14,name:'Sap',emoji:'🧃',price:1.49,cat:'drank'},
+  {id:15,name:'Koffie',emoji:'☕',price:2.49,cat:'drank'},
+  {id:16,name:'Thee',emoji:'🍵',price:1.19,cat:'drank'},
+
+  /* ZUIVEL */
+  {id:17,name:'Melk',emoji:'🥛',price:1.09,cat:'zuivel'},
+  {id:18,name:'Kaas',emoji:'🧀',price:2.49,cat:'zuivel'},
+  {id:19,name:'Yoghurt',emoji:'🍶',price:1.59,cat:'zuivel'},
+  {id:20,name:'Boter',emoji:'🧈',price:1.89,cat:'zuivel'},
+  {id:21,name:'Ijs',emoji:'🍦',price:2.99,cat:'zuivel'},
+
+  /* SNACKS */
+  {id:22,name:'Donut',emoji:'🍩',price:1.29,cat:'snacks'},
+  {id:23,name:'Cookie',emoji:'🍪',price:0.89,cat:'snacks'},
+  {id:24,name:'Lolly',emoji:'🍭',price:0.59,cat:'snacks'},
+  {id:25,name:'Chips',emoji:'🍟',price:1.99,cat:'snacks'},
+  {id:26,name:'Chocolade',emoji:'🍫',price:1.49,cat:'snacks'},
+
+  /* BAKERY */
+  {id:27,name:'Croissant',emoji:'🥐',price:1.19,cat:'bakery'},
+  {id:28,name:'Brood',emoji:'🍞',price:1.99,cat:'bakery'},
+  {id:29,name:'Bagel',emoji:'🥯',price:1.49,cat:'bakery'},
+  {id:30,name:'Pannenkoek',emoji:'🥞',price:2.49,cat:'bakery'}
+
 ];
 
 let currentCategory='fruit';
 let cart=[];
 let total=0;
 
+/* RENDER CATEGORIES */
 function renderCategories(){
-  const tabs=document.getElementById('categoryTabs');
 
-  tabs.innerHTML=categories.map(c=>`
-    <button class="cat-tab"
-      style="background:${c.color}"
-      onclick="selectCategory('${c.id}')">
-      ${c.name}
+  const categoriesDiv=document.getElementById('categories');
+
+  categoriesDiv.innerHTML=categories.map(cat=>`
+
+    <button
+      class="category-btn"
+      style="background:${cat.color}"
+      onclick="selectCategory('${cat.id}')">
+
+      ${cat.name}
+
     </button>
+
   `).join('');
 }
 
-function selectCategory(cat){
-  currentCategory=cat;
+/* SELECT CATEGORY */
+function selectCategory(id){
+
+  currentCategory=id;
+
   renderProducts();
 }
 
+/* RENDER PRODUCTS */
 function renderProducts(){
+
   const grid=document.getElementById('productsGrid');
 
   const filtered=products.filter(p=>p.cat===currentCategory);
 
-  grid.innerHTML=filtered.map(p=>`
-    <button class="product-btn" onclick="addToCart(${p.id})">
-      <span class="emoji">${p.emoji}</span>
-      <span class="name">${p.name}</span>
-      <span class="price">€${p.price.toFixed(2)}</span>
-    </button>
+  grid.innerHTML=filtered.map(product=>`
+
+    <div class="product" onclick="addToCart(${product.id})">
+
+      <div class="emoji">${product.emoji}</div>
+
+      <div class="name">${product.name}</div>
+
+      <div class="price">
+        €${product.price.toFixed(2)}
+      </div>
+
+    </div>
+
   `).join('');
 }
 
+/* ADD TO CART */
 function addToCart(id){
+
   const product=products.find(p=>p.id===id);
 
-  const existing=cart.find(c=>c.id===id);
+  const existing=cart.find(item=>item.id===id);
 
   if(existing){
+
     existing.qty++;
+
   }else{
+
     cart.push({...product,qty:1});
+
   }
 
-  recalc();
-  renderCart();
+  updateCart();
 }
 
-function removeItem(index){
-  cart.splice(index,1);
-  recalc();
-  renderCart();
-}
+/* UPDATE CART */
+function updateCart(){
 
-function clearCart(){
-  cart=[];
-  recalc();
-  renderCart();
-}
+  const cartItems=document.getElementById('cartItems');
 
-function recalc(){
-  total=cart.reduce((s,c)=>s+(c.price*c.qty),0);
-}
+  const totalDiv=document.getElementById('total');
 
-function renderCart(){
+  const count=document.getElementById('count');
 
-  const items=document.getElementById('cartItems');
-  const count=document.getElementById('cartCount');
-  const totalEl=document.getElementById('totalAmount');
-  const payBtn=document.getElementById('payBtn');
+  const btn=document.getElementById('checkoutBtn');
+
+  total=0;
+
+  let qtyTotal=0;
 
   if(cart.length===0){
-    items.innerHTML=`
-      <div class="cart-empty">
-        <div class="big-emoji">🛒</div>
+
+    cartItems.innerHTML=`
+
+      <div class="empty">
+        <div class="emoji">🛒</div>
         <div>Scan producten!</div>
       </div>
+
     `;
+
+    totalDiv.textContent='€0,00';
+
     count.textContent='0 items';
-    totalEl.textContent='€0,00';
-    payBtn.disabled=true;
+
+    btn.disabled=true;
+
     return;
   }
 
-  const totalItems=cart.reduce((s,c)=>s+c.qty,0);
+  btn.disabled=false;
 
-  count.textContent=`${totalItems} items`;
-  totalEl.textContent=`€${total.toFixed(2).replace('.',',')}`;
-  payBtn.disabled=false;
+  cartItems.innerHTML=cart.map((item,index)=>{
 
-  items.innerHTML=cart.map((c,i)=>`
-    <div class="cart-item">
-      <div class="ci-left">
-        <span class="ci-emoji">${c.emoji}</span>
-        <span class="ci-name">${c.name}</span>
-        <span class="ci-qty">${c.qty}</span>
+    total += item.price * item.qty;
+
+    qtyTotal += item.qty;
+
+    return `
+
+      <div class="cart-item">
+
+        <div class="left">
+
+          <div>${item.emoji}</div>
+
+          <div>${item.name}</div>
+
+          <div class="qty">${item.qty}</div>
+
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px">
+
+          <div>€${(item.price*item.qty).toFixed(2)}</div>
+
+          <button class="remove" onclick="removeItem(${index})">
+            ✕
+          </button>
+
+        </div>
+
       </div>
 
-      <span class="ci-price">
-        €${(c.price*c.qty).toFixed(2)}
-      </span>
+    `;
 
-      <button class="ci-remove" onclick="removeItem(${i})">
-        ✕
-      </button>
-    </div>
-  `).join('');
+  }).join('');
+
+  totalDiv.textContent=`€${total.toFixed(2)}`;
+
+  count.textContent=`${qtyTotal} items`;
 }
 
+/* REMOVE ITEM */
+function removeItem(index){
+
+  cart.splice(index,1);
+
+  updateCart();
+}
+
+/* CLEAR */
+function clearCart(){
+
+  cart=[];
+
+  updateCart();
+}
+
+/* CHECKOUT */
+function checkout(){
+
+  if(cart.length===0){
+    alert("Winkelwagen is leeg 🛒");
+    return;
+  }
+
+  let receipt="🧾 BONNETJE\n\n";
+
+  cart.forEach(item=>{
+
+    receipt += `${item.emoji} ${item.name} x${item.qty} - €${(item.price*item.qty).toFixed(2)}\n`;
+
+  });
+
+  receipt += `\n💰 Totaal: €${total.toFixed(2)}`;
+
+  alert(receipt);
+
+  cart=[];
+
+  updateCart();
+}
+
+/* INIT */
 renderCategories();
 renderProducts();
-renderCart();
+updateCart();
+
 </script>
 
 </body>
