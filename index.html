@@ -792,8 +792,31 @@ let currentCategory = '';
 let cart = [];
 let total = 0;
 let sharedReceiptMode = false;
-const BILL_QUERY_KEY = 'bill';
-const BILL_DATA_VERSION = 1;
+const BILL_QUERY_KEY = 'b';
+const LEGACY_BILL_QUERY_KEY = 'bill';
+const BILL_DATA_VERSION = 2;
+const BILL_SHORT_ID_LENGTH = 8;
+
+const RECEIPT_META = {
+  supermarket: {
+    storeName: "🎪 LIZA'S SUPERMARKT",
+    station: 'Kassa #01 - Kids Playroom',
+    columnHeader: 'Product',
+    paymentMethod: 'Betaalwijze: Glimlach & Speelgeld 🌟',
+    footerMessage: 'Bedankt voor je bezoek! 👋\nKom snel nog eens winkelen!',
+    printColor: '#764ba2',
+    receiptPrefix: 'BON'
+  },
+  restaurant: {
+    storeName: "🍳 LIZA'S RESTAURANT",
+    station: 'Tafel #05 - Bestel Terminal',
+    columnHeader: 'Gerecht',
+    paymentMethod: 'Betaalwijze: Smullen & Genieten! ✨',
+    footerMessage: 'Eet smakelijk! 👨‍🍳\nDe kok gaat meteen aan de slag!',
+    printColor: '#ff4757',
+    receiptPrefix: 'ORDER'
+  }
+};
 
 /* --- CATEGORIES --- */
 const smCategories = [
@@ -908,35 +931,119 @@ function decodeBillPayload(encoded) {
   }
 }
 
+function getReceiptMeta(appName) {
+  return appName === 'restaurant' ? RECEIPT_META.restaurant : RECEIPT_META.supermarket;
+}
+
 function getReceiptPrintColor(appName) {
-  return appName === 'restaurant' ? '#ff4757' : '#764ba2';
+  return getReceiptMeta(appName).printColor;
+}
+
+function createShortBillId() {
+  const randomSlice = Math.random().toString(36).slice(2, 10);
+  const timestampSlice = Date.now().toString(36).slice(-4);
+  return `${randomSlice}${timestampSlice}`.slice(0, BILL_SHORT_ID_LENGTH).toUpperCase();
+}
+
+function createCompactBillPayload(payload) {
+  return {
+    v: BILL_DATA_VERSION,
+    i: payload.billShareId || createShortBillId(),
+    a: payload.app === 'restaurant' ? 'r' : 's',
+    d: payload.date,
+    t: payload.time,
+    r: payload.receiptId,
+    p: Number(payload.total) || 0,
+    x: (payload.items || []).map(item => [
+      item.emoji || '📦',
+      item.name || 'Item',
+      Number(item.qty) || 1,
+      Number(item.lineTotal) || 0
+    ])
+  };
+}
+
+function parseSharedBillPayload(encodedValue) {
+  if (!encodedValue) return null;
+
+  // New compact format: BILLID.base64payload
+  if (encodedValue.includes('.')) {
+    const [billIdFromUrl, encodedPayload] = encodedValue.split('.', 2);
+    const compact = decodeBillPayload(encodedPayload);
+    if (compact && Number(compact.v) === BILL_DATA_VERSION) {
+      const appName = compact.a === 'r' ? 'restaurant' : 'supermarket';
+      const compactItems = Array.isArray(compact.x)
+        ? compact.x.map(item => {
+            if (!Array.isArray(item)) return null;
+            return { emoji: item[0], name: item[1], qty: item[2], lineTotal: item[3] };
+          }).filter(Boolean)
+        : [];
+
+      const normalizedItems = normalizeReceiptItems(compactItems);
+      const fallbackTotal = normalizedItems.reduce((sum, item) => sum + item.lineTotal, 0);
+      const compactTotal = Number(compact.p);
+      const meta = getReceiptMeta(appName);
+
+      return {
+        version: BILL_DATA_VERSION,
+        app: appName,
+        billShareId: String(billIdFromUrl || compact.i || '').slice(0, BILL_SHORT_ID_LENGTH).toUpperCase(),
+        storeName: meta.storeName,
+        station: meta.station,
+        date: compact.d,
+        time: compact.t,
+        columnHeader: meta.columnHeader,
+        paymentMethod: meta.paymentMethod,
+        receiptId: compact.r || `${meta.receiptPrefix}-SHARED`,
+        footerMessage: meta.footerMessage,
+        total: Number.isFinite(compactTotal) ? compactTotal : fallbackTotal,
+        items: normalizedItems
+      };
+    }
+  }
+
+  // Backward compatibility for old shared links
+  const legacyPayload = decodeBillPayload(encodedValue);
+  if (!legacyPayload || Number(legacyPayload.version) !== 1) return null;
+
+  return {
+    ...legacyPayload,
+    billShareId: String(legacyPayload.billShareId || legacyPayload.receiptId || '').slice(0, BILL_SHORT_ID_LENGTH).toUpperCase()
+  };
 }
 
 function buildBillShareUrl(payload) {
+  const compact = createCompactBillPayload(payload);
   const url = new URL(window.location.href);
-  url.searchParams.set(BILL_QUERY_KEY, encodeBillPayload(payload));
+  url.searchParams.delete(LEGACY_BILL_QUERY_KEY);
+  url.searchParams.set(BILL_QUERY_KEY, `${compact.i}.${encodeBillPayload(compact)}`);
   return url.toString();
 }
 
 function clearBillShareParamFromUrl() {
   const url = new URL(window.location.href);
-  if (!url.searchParams.has(BILL_QUERY_KEY)) return;
+  const hasShareParams = url.searchParams.has(BILL_QUERY_KEY) || url.searchParams.has(LEGACY_BILL_QUERY_KEY);
+  if (!hasShareParams) return;
   url.searchParams.delete(BILL_QUERY_KEY);
+  url.searchParams.delete(LEGACY_BILL_QUERY_KEY);
   history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
 }
 
-function setReceiptShareUi(shareUrl, fromScan = false) {
+function setReceiptShareUi(shareUrl, fromScan = false, billShareId = '') {
   const qrBox = document.getElementById('receiptQrCode');
   const shareLink = document.getElementById('receiptShareLink');
   const help = document.getElementById('receiptQrHelp');
   if (!qrBox || !shareLink || !help) return;
 
   qrBox.innerHTML = '';
+  const idLabel = billShareId ? ` Bon-ID: ${billShareId}` : '';
   help.textContent = fromScan
-    ? 'Deze bon is geopend via een QR-scan. Je kunt hem ook weer doorsturen.'
-    : 'Scan deze QR om de bon op je telefoon te openen.';
+    ? `Deze bon is geopend via een QR-scan.${idLabel}`
+    : `Scan deze QR om de bon op je telefoon te openen.${idLabel}`;
   shareLink.href = shareUrl;
-  shareLink.textContent = fromScan ? '🔗 Deel deze bon-link' : '📱 Open bon op telefoon';
+  shareLink.textContent = fromScan
+    ? `🔗 Deel deze bon-link${billShareId ? ` (${billShareId})` : ''}`
+    : `📱 Open bon op telefoon${billShareId ? ` (${billShareId})` : ''}`;
 
   if (window.QRCode) {
     new QRCode(qrBox, {
@@ -1012,11 +1119,11 @@ function setReceiptFooterMessage(message) {
 
 function openSharedBillFromUrlIfAvailable() {
   const params = new URLSearchParams(window.location.search);
-  const encodedBill = params.get(BILL_QUERY_KEY);
+  const encodedBill = params.get(BILL_QUERY_KEY) || params.get(LEGACY_BILL_QUERY_KEY);
   if (!encodedBill) return;
 
-  const payload = decodeBillPayload(encodedBill);
-  if (!payload || payload.version !== BILL_DATA_VERSION) return;
+  const payload = parseSharedBillPayload(encodedBill);
+  if (!payload) return;
 
   const appName = payload.app === 'restaurant' ? 'restaurant' : 'supermarket';
   const items = normalizeReceiptItems(payload.items);
@@ -1038,7 +1145,7 @@ function openSharedBillFromUrlIfAvailable() {
   document.getElementById('receiptTotalPrice').textContent = formatPrice(totalAmount);
   renderReceiptItems(items);
   applyReceiptTheme(appName);
-  setReceiptShareUi(window.location.href, true);
+  setReceiptShareUi(window.location.href, true, payload.billShareId);
 
   sharedReceiptMode = true;
   document.getElementById('receiptModal').classList.add('open');
@@ -1272,28 +1379,14 @@ function checkout(){
   document.getElementById('receiptTotalItems').textContent = qtyTotal;
   document.getElementById('receiptTotalPrice').textContent = formatPrice(total);
 
-  let receiptStoreName = '';
-  let receiptStation = '';
-  let receiptColHeader = '';
-  let receiptPaymentMethod = '';
-  let receiptId = '';
-  let receiptFooterMsg = '';
-
-  if(activeApp === 'supermarket') {
-    receiptStoreName = "🎪 LIZA'S SUPERMARKT";
-    receiptStation = "Kassa #01 - Kids Playroom";
-    receiptColHeader = "Product";
-    receiptPaymentMethod = "Betaalwijze: Glimlach & Speelgeld 🌟";
-    receiptId = 'BON-' + Math.floor(10000 + Math.random() * 90000);
-    receiptFooterMsg = "Bedankt voor je bezoek! 👋\nKom snel nog eens winkelen!";
-  } else {
-    receiptStoreName = "🍳 LIZA'S RESTAURANT";
-    receiptStation = "Tafel #05 - Bestel Terminal";
-    receiptColHeader = "Gerecht";
-    receiptPaymentMethod = "Betaalwijze: Smullen & Genieten! ✨";
-    receiptId = 'ORDER-' + Math.floor(10000 + Math.random() * 90000);
-    receiptFooterMsg = "Eet smakelijk! 👨‍🍳\nDe kok gaat meteen aan de slag!";
-  }
+  const receiptMeta = getReceiptMeta(activeApp);
+  const receiptStoreName = receiptMeta.storeName;
+  const receiptStation = receiptMeta.station;
+  const receiptColHeader = receiptMeta.columnHeader;
+  const receiptPaymentMethod = receiptMeta.paymentMethod;
+  const receiptFooterMsg = receiptMeta.footerMessage;
+  const receiptId = `${receiptMeta.receiptPrefix}-${Math.floor(10000 + Math.random() * 90000)}`;
+  const billShareId = createShortBillId();
 
   document.getElementById('receiptStoreName').textContent = receiptStoreName;
   document.getElementById('receiptStation').textContent = receiptStation;
@@ -1305,6 +1398,7 @@ function checkout(){
 
   const sharePayload = {
     version: BILL_DATA_VERSION,
+    billShareId: billShareId,
     app: activeApp,
     storeName: receiptStoreName,
     station: receiptStation,
@@ -1318,7 +1412,7 @@ function checkout(){
     items: receiptItems
   };
   const shareUrl = buildBillShareUrl(sharePayload);
-  setReceiptShareUi(shareUrl, false);
+  setReceiptShareUi(shareUrl, false, billShareId);
   sharedReceiptMode = false;
 
   document.getElementById('receiptModal').classList.add('open');
