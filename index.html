@@ -508,6 +508,16 @@ body{
 .receipt-header { text-align: center; margin-bottom: 15px; }
 .receipt-store-name { font-size: 1.2rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
 .receipt-meta { font-size: 0.75rem; color: #555; margin-top: 5px; line-height: 1.3; }
+.receipt-payment-status {
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 600;
+  min-height: 1.1rem;
+  margin-top: 6px;
+  color: #444;
+}
+.receipt-payment-status.paid { color: #2ed573; }
+.receipt-payment-status.partial { color: #ff9f1a; }
 .receipt-divider { border-top: 1px dashed #444; margin: 10px 0; }
 .receipt-table { width: 100%; font-size: 0.85rem; border-collapse: collapse; }
 .receipt-table th { text-align: left; font-weight: bold; padding-bottom: 5px; }
@@ -538,7 +548,22 @@ body{
   word-break: break-all;
 }
 .receipt-footer-msg { text-align: center; font-size: 0.8rem; font-style: italic; margin-top: 5px; }
-.receipt-actions { padding: 15px; background: #f5f5f5; display: flex; gap: 10px; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; }
+.receipt-actions { padding: 15px; background: #f5f5f5; display: flex; flex-wrap: wrap; gap: 10px; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; }
+.receipt-pay-group {
+  display: none;
+  width: 100%;
+  gap: 8px;
+  align-items: center;
+}
+.receipt-pay-input {
+  flex: 1;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  min-width: 0;
+}
+.btn-pay { background: #2ed573; color: #fff; }
 
 .btn-receipt {
   flex: 1; padding: 12px; border: none; border-radius: 8px;
@@ -579,6 +604,10 @@ body.shared-bill-only .receipt-container {
 
 body.shared-bill-only .btn-close-modal {
   display: none !important;
+}
+
+body.shared-bill-only .receipt-pay-group {
+  display: flex;
 }
 
 /* PRINT OPTIMIZATION */
@@ -791,6 +820,7 @@ body.shared-bill-only .btn-close-modal {
       <div class="receipt-divider"></div>
       
       <div class="receipt-meta" style="text-align: center;" id="receiptPaymentMethod">Betaalwijze</div>
+      <div class="receipt-payment-status" id="receiptPaymentStatus"></div>
       
       <div class="receipt-barcode">
         ||||| | |||| || ||| ||||
@@ -807,6 +837,10 @@ body.shared-bill-only .btn-close-modal {
     </div>
     
     <div class="receipt-actions">
+      <div class="receipt-pay-group" id="receiptPayGroup">
+        <input type="number" id="receiptPayAmount" class="receipt-pay-input" step="0.01" min="0" placeholder="Ontvangen bedrag">
+        <button class="btn-receipt btn-pay" id="receiptPayBtn" onclick="payReceipt()">💳 Betaal</button>
+      </div>
       <button class="btn-receipt btn-close-modal" onclick="closeReceipt()">Sluiten</button>
       <button class="btn-receipt btn-print" id="receiptPrintBtn" onclick="window.print()">🖨️ Printen</button>
     </div>
@@ -823,6 +857,8 @@ let cart = [];
 let total = 0;
 let sharedReceiptMode = false;
 let sharedBillOnlyMode = false;
+let receiptTotalAmount = 0;
+let receiptReceivedAmount = 0;
 const BILL_QUERY_KEY = 'b';
 const LEGACY_BILL_QUERY_KEY = 'bill';
 const BILL_DATA_VERSION = 2;
@@ -1153,6 +1189,86 @@ function setSharedBillOnlyMode(enabled) {
   document.body.classList.toggle('shared-bill-only', sharedBillOnlyMode);
 }
 
+function parseEnteredAmount(value) {
+  const normalized = String(value || '').trim().replace(',', '.');
+  if (!normalized) return null;
+  const parsed = Number(normalized);
+  if (!Number.isFinite(parsed) || parsed < 0) return null;
+  return Number(parsed.toFixed(2));
+}
+
+function resetReceiptPaymentState(totalAmount, paymentMethodText) {
+  const totalAsNumber = Number(totalAmount);
+  receiptTotalAmount = Number.isFinite(totalAsNumber) ? Number(totalAsNumber.toFixed(2)) : 0;
+  receiptReceivedAmount = 0;
+
+  const paymentMethodEl = document.getElementById('receiptPaymentMethod');
+  const paymentStatusEl = document.getElementById('receiptPaymentStatus');
+  const payInput = document.getElementById('receiptPayAmount');
+  const payBtn = document.getElementById('receiptPayBtn');
+
+  if (paymentMethodEl) {
+    paymentMethodEl.textContent = paymentMethodText || 'Betaalwijze';
+  }
+
+  if (paymentStatusEl) {
+    paymentStatusEl.textContent = '';
+    paymentStatusEl.className = 'receipt-payment-status';
+  }
+
+  if (payInput) {
+    payInput.value = '';
+    payInput.disabled = false;
+    payInput.placeholder = `Ontvangen bedrag (standaard ${formatPrice(receiptTotalAmount)})`;
+  }
+
+  if (payBtn) {
+    payBtn.textContent = '💳 Betaal';
+    payBtn.disabled = false;
+  }
+}
+
+function payReceipt() {
+  if (!sharedBillOnlyMode) return;
+
+  const payInput = document.getElementById('receiptPayAmount');
+  const payBtn = document.getElementById('receiptPayBtn');
+  const paymentMethodEl = document.getElementById('receiptPaymentMethod');
+  const paymentStatusEl = document.getElementById('receiptPaymentStatus');
+  if (!paymentMethodEl || !paymentStatusEl || !payInput || !payBtn) return;
+
+  const remainingBeforePayment = Number(Math.max(receiptTotalAmount - receiptReceivedAmount, 0).toFixed(2));
+  if (remainingBeforePayment <= 0) return;
+
+  const enteredAmount = parseEnteredAmount(payInput.value);
+  const receivedNow = enteredAmount === null ? remainingBeforePayment : enteredAmount;
+  if (receivedNow <= 0) {
+    alert('Vul een geldig ontvangen bedrag in.');
+    return;
+  }
+
+  receiptReceivedAmount = Number((receiptReceivedAmount + receivedNow).toFixed(2));
+
+  const outstanding = Number(Math.max(receiptTotalAmount - receiptReceivedAmount, 0).toFixed(2));
+  const paidAmount = Number(Math.min(receiptReceivedAmount, receiptTotalAmount).toFixed(2));
+  const change = Number(Math.max(receiptReceivedAmount - receiptTotalAmount, 0).toFixed(2));
+
+  if (outstanding === 0) {
+    paymentMethodEl.textContent = `✅ Betaald: ${formatPrice(paidAmount)} • Ontvangen: ${formatPrice(receiptReceivedAmount)}`;
+    paymentStatusEl.className = 'receipt-payment-status paid';
+    paymentStatusEl.textContent = change > 0 ? `Wisselgeld: ${formatPrice(change)}` : 'Volledig betaald';
+    payBtn.textContent = '✅ Betaald';
+    payBtn.disabled = true;
+    payInput.disabled = true;
+  } else {
+    paymentMethodEl.textContent = `💳 Betaald: ${formatPrice(paidAmount)} • Ontvangen: ${formatPrice(receiptReceivedAmount)}`;
+    paymentStatusEl.className = 'receipt-payment-status partial';
+    paymentStatusEl.textContent = `Nog openstaand: ${formatPrice(outstanding)}`;
+    payBtn.textContent = '💳 Voeg betaling toe';
+    payInput.value = '';
+  }
+}
+
 function openSharedBillFromUrlIfAvailable() {
   const params = new URLSearchParams(window.location.search);
   const encodedBill = params.get(BILL_QUERY_KEY) || params.get(LEGACY_BILL_QUERY_KEY);
@@ -1174,11 +1290,11 @@ function openSharedBillFromUrlIfAvailable() {
   document.getElementById('receiptDate').textContent = payload.date || new Date().toLocaleDateString('nl-NL');
   document.getElementById('receiptTime').textContent = payload.time || new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
   document.getElementById('receiptColHeader').textContent = payload.columnHeader || 'Item';
-  document.getElementById('receiptPaymentMethod').textContent = payload.paymentMethod || 'Betaalwijze';
   document.getElementById('receiptId').textContent = payload.receiptId || '#SHARED';
   setReceiptFooterMessage(payload.footerMessage || 'Bedankt!');
   document.getElementById('receiptTotalItems').textContent = totalItems;
   document.getElementById('receiptTotalPrice').textContent = formatPrice(totalAmount);
+  resetReceiptPaymentState(totalAmount, payload.paymentMethod || 'Betaalwijze');
   renderReceiptItems(items);
   applyReceiptTheme(appName);
   setReceiptShareUi(window.location.href, true, payload.billShareId);
@@ -1428,9 +1544,9 @@ function checkout(){
   document.getElementById('receiptStoreName').textContent = receiptStoreName;
   document.getElementById('receiptStation').textContent = receiptStation;
   document.getElementById('receiptColHeader').textContent = receiptColHeader;
-  document.getElementById('receiptPaymentMethod').textContent = receiptPaymentMethod;
   document.getElementById('receiptId').textContent = receiptId;
   setReceiptFooterMessage(receiptFooterMsg);
+  resetReceiptPaymentState(total, receiptPaymentMethod);
   applyReceiptTheme(activeApp);
 
   const sharePayload = {
@@ -1464,6 +1580,7 @@ function closeReceipt(){
   document.getElementById('receiptModal').classList.remove('open');
   sharedReceiptMode = false;
   setSharedBillOnlyMode(false);
+  resetReceiptPaymentState(0, 'Betaalwijze');
   cart = [];
   updateCart();
 }
